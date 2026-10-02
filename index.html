@@ -2,958 +2,671 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BeautyFlow Pro — Gestão Completa & Agendamento</title>
-  <!-- Biblioteca Oficial do Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#10111a">
+  <title>AgendaPro — Gestão de agendamentos</title>
+
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
-
     :root {
-      --bg: #f8f7f5;
-      --surface: #ffffff;
-      --text: #23201b;
-      --text-muted: #7f7a72;
-      --border: #e6e3dd;
-      --primary: #6941c6;
-      --primary-hover: #5332a6;
-      --primary-light: #f4f0fd;
-      --success: #127953;
-      --success-light: #e6f6ee;
-      --warning: #b54708;
-      --warning-light: #fffaeb;
-      --danger: #b42318;
-      --sidebar-w: 250px;
-      --radius: 12px;
+      color-scheme: dark;
+      --bg: #10111a;
+      --surface: #181a26;
+      --surface-2: #202332;
+      --border: #2c3040;
+      --text: #f4f5fb;
+      --muted: #9da3b7;
+      --primary: #a78bfa;
+      --primary-hover: #9270f4;
+      --green: #56d6a2;
+      --red: #ff7485;
+      --radius: 16px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
-    button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+    * { box-sizing: border-box; }
 
-    /* BACKDROP MOBILE */
-    .backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 50;
-      opacity: 0; pointer-events: none; transition: opacity .25s ease;
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(ellipse at 10% 0%, rgba(124, 92, 235, .15), transparent 38%),
+        var(--bg);
     }
-    .backdrop.active { opacity: 1; pointer-events: auto; }
 
-    /* SIDEBAR */
-    .sidebar {
-      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
-      position: fixed; top: 0; bottom: 0; left: 0; z-index: 60;
-      display: flex; flex-direction: column; transition: transform .25s ease;
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .shell {
+      display: grid;
+      grid-template-columns: 240px minmax(0, 1fr);
+      min-height: 100vh;
     }
-    .brand { height: 64px; padding: 0 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
-    .brand-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--primary); color: #fff; font-weight: 800; display: grid; place-items: center; font-size: 16px; }
-    .brand-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 15px; }
-    .brand-title span { color: var(--primary); }
 
-    .nav-list { list-style: none; padding: 12px 8px; display: flex; flex-direction: column; gap: 3px; flex: 1; overflow-y: auto; }
-    .nav-btn {
-      width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px;
-      background: transparent; border: 0; border-radius: 8px; font-size: 13px; font-weight: 600;
-      color: #555; cursor: pointer; text-align: left; transition: background .15s;
+    aside {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      padding: 26px 18px;
+      border-right: 1px solid var(--border);
+      background: rgba(16, 17, 26, .84);
     }
-    .nav-btn:hover { background: #f2f1ed; color: var(--text); }
-    .nav-btn.active { background: var(--primary-light); color: var(--primary); }
-    .nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
 
-    /* TOPBAR & MAIN */
-    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      padding: 0 8px;
+      font-size: 19px;
+      font-weight: 750;
+      letter-spacing: -.5px;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 12px;
+      color: #171324;
+      background: linear-gradient(135deg, #c4b5fd, #8b5cf6);
+    }
+
+    .nav-label {
+      margin: 0 10px 9px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      width: 100%;
+      margin: 3px 0;
+      padding: 11px 12px;
+      border: 0;
+      border-radius: 11px;
+      color: var(--muted);
+      background: transparent;
+      text-align: left;
+    }
+
+    .nav-item.active, .nav-item:hover {
+      color: var(--text);
+      background: var(--surface-2);
+    }
+
+    .side-bottom {
+      margin-top: auto;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    main { min-width: 0; padding: 30px clamp(18px, 4vw, 54px); }
+
     .topbar {
-      height: 64px; background: var(--surface); border-bottom: 1px solid var(--border);
-      padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-      position: sticky; top: 0; z-index: 40;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 30px;
     }
-    .top-left, .top-right { display: flex; align-items: center; gap: 10px; }
-    .menu-toggle {
-      display: none; background: transparent; border: 1px solid var(--border);
-      width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px; place-items: center;
+
+    .eyebrow { color: var(--muted); font-size: 13px; }
+    h1 { margin: 5px 0 0; font-size: clamp(25px, 4vw, 34px); letter-spacing: -1px; }
+    .top-actions { display: flex; align-items: center; gap: 10px; }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 15px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      color: var(--text);
+      background: var(--surface);
+      font-weight: 650;
     }
-    .unit-tag { font-size: 13px; color: var(--text-muted); }
-    .unit-tag strong { color: var(--text); }
 
-    .btn-action {
-      background: var(--primary); color: #fff; border: 0; border-radius: 8px;
-      padding: 0 14px; height: 36px; font-size: 12px; font-weight: 700; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
-      transition: background .15s;
+    .button:hover { background: var(--surface-2); }
+    .button.primary { border-color: transparent; color: #191329; background: var(--primary); }
+    .button.primary:hover { background: var(--primary-hover); }
+    .button.danger { color: var(--red); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
     }
-    .btn-action:hover { background: var(--primary-hover); }
-    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-    .btn-secondary:hover { background: #f2f1ed; }
 
-    /* CONTEÚDO */
-    .content { padding: 22px; max-width: 1200px; width: 100%; margin: 0 auto; }
-    .view-page { display: none; }
-    .view-page.active { display: block; }
-
-    .page-title { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
-    .page-title h1 { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
-    .page-title p { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
-
-    /* CARDS & TABELAS */
-    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .card-m { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
-    .card-m small { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; }
-    .card-m .val { font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; margin: 6px 0; }
-    .card-m .tag { font-size: 11px; font-weight: 600; color: var(--success); }
-
-    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
-    .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; }
-    
-    .table-responsive { width: 100%; overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
-    th { background: #faf9f7; padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
-    td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
-    tr:last-child td { border-bottom: 0; }
-
-    .pill { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: var(--success-light); color: var(--success); }
-    .pill.orange { background: var(--warning-light); color: var(--warning); }
-    .pill.blue { background: var(--primary-light); color: var(--primary); }
-
-    /* FORMULÁRIOS & CONFIGURAÇÃO */
-    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; padding: 18px; }
-    .field { display: flex; flex-direction: column; gap: 5px; }
-    .field label { font-size: 11px; font-weight: 700; color: #444; }
-    .field input, .field select, .field textarea {
-      height: 38px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; font-size: 13px; outline: none; background: #fff;
+    .stat, .panel {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: rgba(24, 26, 38, .92);
     }
-    .field textarea { height: 75px; padding: 8px 10px; resize: vertical; }
-    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); }
 
-    /* MODAL */
-    .modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; place-items: center; padding: 16px; }
-    .modal-wrap.open { display: grid; }
-    .modal { background: #fff; width: 100%; max-width: 440px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-    .modal-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .modal-head h3 { font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700; }
-    .close-btn { background: none; border: 0; font-size: 20px; cursor: pointer; color: var(--text-muted); }
-    .modal-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; max-height: 70vh; overflow-y: auto; }
-    .modal-foot { padding: 12px 18px; background: #fbfbfa; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .stat { padding: 19px; }
+    .stat-label { color: var(--muted); font-size: 13px; }
+    .stat-number { margin-top: 10px; font-size: 29px; font-weight: 750; letter-spacing: -.8px; }
+    .stat-hint { margin-top: 5px; color: var(--muted); font-size: 12px; }
 
-    /* TOAST */
-    .toast {
-      position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 340px; margin: 0 auto;
-      background: #1c1a1f; color: #fff; padding: 12px 16px; border-radius: 10px; font-size: 12px; font-weight: 500;
-      text-align: center; opacity: 0; transform: translateY(20px); transition: all .25s ease; pointer-events: none; z-index: 200;
+    .panel { overflow: hidden; }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 19px 20px;
+      border-bottom: 1px solid var(--border);
     }
-    .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* RESPONSIVIDADE */
-    @media (max-width: 800px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); }
-      .main { margin-left: 0; }
-      .menu-toggle { display: grid; }
+    .panel-head h2 { margin: 0; font-size: 16px; }
+    .panel-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 15px 20px; border-bottom: 1px solid rgba(44, 48, 64, .72); white-space: nowrap; }
+    th { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
+    td { font-size: 13px; }
+    tbody tr:last-child td { border-bottom: 0; }
+
+    .client-name { font-weight: 650; }
+    .subtext { margin-top: 4px; color: var(--muted); font-size: 12px; }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      color: var(--green);
+      background: rgba(86, 214, 162, .1);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .empty { padding: 45px 20px; color: var(--muted); text-align: center; }
+    .empty strong { display: block; margin-bottom: 6px; color: var(--text); }
+
+    .notice {
+      display: none;
+      margin-bottom: 16px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      color: var(--muted);
+      background: var(--surface);
+      font-size: 13px;
+    }
+
+    .notice.error { display: block; color: #ff9ca8; border-color: rgba(255,116,133,.35); }
+    .notice.success { display: block; color: var(--green); border-color: rgba(86,214,162,.35); }
+
+    .login-screen {
+      display: grid;
+      min-height: 100vh;
+      place-items: center;
+      padding: 20px;
+    }
+
+    .login-card {
+      width: min(100%, 420px);
+      padding: 28px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      background: var(--surface);
+      box-shadow: 0 24px 80px rgba(0,0,0,.28);
+    }
+
+    .login-card h1 { margin-bottom: 9px; font-size: 25px; }
+    .login-card > p { margin: 0 0 22px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    .field { display: grid; gap: 7px; margin: 14px 0; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 650; }
+
+    .field input, .field select {
+      width: 100%;
+      min-height: 43px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      outline: none;
+      color: var(--text);
+      background: #131520;
+    }
+
+    .field input:focus, .field select:focus { border-color: var(--primary); }
+    .full { width: 100%; margin-top: 8px; }
+    .switch-auth { display: block; margin: 17px auto 0; border: 0; color: var(--primary); background: transparent; }
+    .hidden { display: none !important; }
+
+    dialog {
+      width: min(100% - 28px, 480px);
+      padding: 0;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      color: var(--text);
+      background: var(--surface);
+    }
+
+    dialog::backdrop { background: rgba(5, 6, 12, .72); backdrop-filter: blur(4px); }
+    .dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 20px 22px; border-bottom: 1px solid var(--border); }
+    .dialog-head h2 { margin: 0; font-size: 17px; }
+    .dialog-body { padding: 8px 22px 22px; }
+    .close { border: 0; color: var(--muted); background: transparent; font-size: 23px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .footer-note { margin-top: 15px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+
+    @media (max-width: 760px) {
+      .shell { display: block; }
+      aside { display: none; }
+      main { padding: 22px 15px; }
+      .stats { grid-template-columns: 1fr; gap: 10px; }
+      .stat { padding: 15px; }
+      .stat-number { font-size: 25px; }
+      .topbar { align-items: flex-start; }
+      .top-actions .button:not(.primary) { display: none; }
+      th, td { padding: 13px 14px; }
+      .panel-head { padding: 16px; }
+    }
+
+    @media (max-width: 430px) {
+      .topbar { flex-direction: column; }
+      .top-actions { width: 100%; }
+      .top-actions .button { flex: 1; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
     }
   </style>
 </head>
+
 <body>
-
-  <div class="backdrop" id="backdrop"></div>
-
-  <!-- MENU LATERAL -->
-  <aside class="sidebar" id="sidebar">
-    <div class="brand">
-      <div class="brand-icon" id="logoPreview">B</div>
-      <div class="brand-title"><span id="sidebarOrgName">BeautyFlow</span> Pro</div>
-    </div>
-
-    <ul class="nav-list">
-      <li><button class="nav-btn active" data-page="dash">📊 Painel Operacional</button></li>
-      <li><button class="nav-btn" data-page="agenda">📅 Gestão da Agenda <span class="nav-badge" id="badgeAgenda">0</span></button></li>
-      <li><button class="nav-btn" data-page="google">🔄 Google Agenda</button></li>
-      <li><button class="nav-btn" data-page="clientes">👥 Clientes & CRM</button></li>
-      <li><button class="nav-btn" data-page="anamnese">📝 Fichas de Anamnese</button></li>
-      <li><button class="nav-btn" data-page="equipe">✂️ Equipe & Comissões</button></li>
-      <li><button class="nav-btn" data-page="personalizar">🎨 Personalização & Link</button></li>
-    </ul>
-  </aside>
-
-  <!-- ÁREA DE OPERAÇÃO -->
-  <div class="main">
-    <header class="topbar">
-      <div class="top-left">
-        <button class="menu-toggle" id="btnToggleMenu" aria-label="Abrir Menu">☰</button>
-        <span class="unit-tag">Unidade: <strong id="topbarUnitName">Carregando...</strong></span>
+  <section id="loginScreen" class="login-screen">
+    <div class="login-card">
+      <div class="brand" style="padding:0;margin-bottom:22px">
+        <span class="brand-mark">✦</span>
+        <span>AgendaPro</span>
       </div>
-      <div class="top-right">
-        <button class="btn-action btn-secondary" id="btnShareBooking" title="Copiar Link de Agendamento">
-          🔗 Link de Agendamento
-        </button>
-        <button class="btn-action" id="btnOpenBookingModal">
-          <span>+</span> Agendar Horário
-        </button>
-      </div>
-    </header>
-
-    <div class="content">
-
-      <!-- 1. DASHBOARD -->
-      <section class="view-page active" id="page-dash">
-        <div class="page-title">
-          <div>
-            <h1>Visão Geral</h1>
-            <p>Monitore os atendimentos, clientes e desempenho do seu espaço em tempo real.</p>
-          </div>
+      <h1 id="authTitle">Entre na sua conta</h1>
+      <p id="authDescription">Acesse sua agenda e organize seus atendimentos em um só lugar.</p>
+      <div id="authNotice" class="notice"></div>
+      <form id="authForm">
+        <div class="field">
+          <label for="email">E-mail</label>
+          <input id="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com">
         </div>
-
-        <div class="metrics">
-          <div class="card-m">
-            <small>Atendimentos Marcados</small>
-            <div class="val" id="metricBookings">0</div>
-            <span class="tag">Atualizado agora</span>
-          </div>
-          <div class="card-m">
-            <small>Faturamento Previsto</small>
-            <div class="val" id="metricRevenue">R$ 0,00</div>
-            <span class="tag">Total bruto</span>
-          </div>
-          <div class="card-m">
-            <small>Comissões a Repassar</small>
-            <div class="val" id="metricCommissions">R$ 0,00</div>
-            <span class="tag">Estimativa calculada</span>
-          </div>
-          <div class="card-m">
-            <small>Clientes Cadastrados</small>
-            <div class="val" id="metricClients">0</div>
-            <span class="tag">Fichas salvas</span>
-          </div>
+        <div class="field">
+          <label for="password">Senha</label>
+          <input id="password" type="password" autocomplete="current-password" required minlength="6" placeholder="Mínimo de 6 caracteres">
         </div>
-
-        <div class="panel">
-          <div class="panel-head">
-            <span>Próximos Agendamentos</span>
-            <button class="btn-action btn-secondary" onclick="navigateTo('agenda')">Ver Agenda Completa</button>
-          </div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>Cliente</th>
-                  <th>Serviço</th>
-                  <th>Horário</th>
-                  <th>Profissional</th>
-                  <th>Origem</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="dashTableBody">
-                <tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum agendamento realizado ainda. Clique em "+ Agendar Horário".</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 2. GESTÃO DA AGENDA -->
-      <section class="view-page" id="page-agenda">
-        <div class="page-title">
-          <div>
-            <h1>Agenda do Estabelecimento</h1>
-            <p>Gerencie horários locais e visualize períodos sincronizados.</p>
-          </div>
-          <button class="btn-action" onclick="openModal('modalBooking')">+ Novo Agendamento</button>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">Compromissos Agendados</div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>Data/Hora</th>
-                  <th>Cliente</th>
-                  <th>Serviço</th>
-                  <th>Valor</th>
-                  <th>Profissional</th>
-                  <th>Comissão</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="agendaTableBody">
-                <tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum agendamento registrado.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 3. GOOGLE CALENDAR -->
-      <section class="view-page" id="page-google">
-        <div class="page-title">
-          <div>
-            <h1>Sincronização com Google Agenda</h1>
-            <p>Escolha operar apenas com a agenda nativa do sistema ou ativar o espelhamento bidirecional.</p>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">Modo de Operação da Agenda</div>
-          <div style="padding: 20px;">
-            <div class="field" style="margin-bottom: 16px;">
-              <label>Escolha o Modo Principal</label>
-              <select id="googleModeSelect" onchange="toggleGoogleSyncMode()">
-                <option value="internal">Agenda Interna do Sistema (Padrão e Independente)</option>
-                <option value="google">Vincular e Sincronizar com Google Agenda (OAuth 2.0)</option>
-              </select>
-            </div>
-
-            <div id="googleConfigArea" style="display: none; background: #faf9f7; border: 1px dashed var(--border); padding: 16px; border-radius: 8px;">
-              <p style="font-size: 13px; margin-bottom: 12px;">Para espelhamento direto entre o sistema e o Google Calendar de cada profissional, o sistema consome a Google Calendar API (v3).</p>
-              
-              <div class="field" style="margin-bottom: 12px;">
-                <label>Conta Google Conectada</label>
-                <input type="email" id="googleAccountEmail" placeholder="profissional@gmail.com">
-              </div>
-
-              <div style="display: flex; gap: 10px; align-items: center;">
-                <button class="btn-action" onclick="saveGoogleSettings()">Salvar Conexão Google</button>
-                <span id="googleStatusBadge" class="pill orange">Desconectado</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- 4. CLIENTES & CRM -->
-      <section class="view-page" id="page-clientes">
-        <div class="page-title">
-          <div>
-            <h1>Base de Clientes & CRM</h1>
-            <p>Histórico, preferências e cadastro unificado.</p>
-          </div>
-          <button class="btn-action" onclick="openModal('modalClient')">+ Cadastrar Cliente</button>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">Lista de Clientes</div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome Completo</th>
-                  <th>Telefone / WhatsApp</th>
-                  <th>E-mail</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="clientsTableBody">
-                <tr><td colspan="4" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum cliente cadastrado. Clique no botão acima para adicionar.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 5. FICHAS DE ANAMNESE -->
-      <section class="view-page" id="page-anamnese">
-        <div class="page-title">
-          <div>
-            <h1>Fichas de Anamnese Digital</h1>
-            <p>Formulários de sensibilidade, histórico de procedimentos e termos de consentimento.</p>
-          </div>
-          <button class="btn-action" onclick="openModal('modalAnamnese')">+ Preencher Nova Ficha</button>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">Fichas Cadastradas</div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>Cliente</th>
-                  <th>Data</th>
-                  <th>Alergias / Sensibilidades</th>
-                  <th>Histórico Químico</th>
-                  <th>Consentimento</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="anamneseTableBody">
-                <tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhuma ficha cadastrada ainda.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 6. EQUIPE & COMISSÕES -->
-      <section class="view-page" id="page-equipe">
-        <div class="page-title">
-          <div>
-            <h1>Equipe & Regras de Comissões</h1>
-            <p>Cadastre os profissionais e estabeleça as porcentagens de repasse financeiro.</p>
-          </div>
-          <button class="btn-action" onclick="openModal('modalStaff')">+ Cadastrar Profissional</button>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">Profissionais Ativos</div>
-          <div class="table-responsive">
-            <table>
-              <thead>
-                <tr>
-                  <th>Nome</th>
-                  <th>Especialidade</th>
-                  <th>Comissão (%)</th>
-                  <th>Modo de Agenda</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="staffTableBody">
-                <tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum profissional cadastrado. Adicione sua equipe acima.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </section>
-
-      <!-- 7. PERSONALIZAÇÃO & LINK PÚBLICO -->
-      <section class="view-page" id="page-personalizar">
-        <div class="page-title">
-          <div>
-            <h1>Personalização & Link de Agendamento</h1>
-            <p>Configure a identidade visual do seu salão e copie o link público para seus clientes.</p>
-          </div>
-          <button class="btn-action" onclick="saveSettings()">Salvar Configurações</button>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">Configuração da Conexão Supabase</div>
-          <div class="form-grid">
-            <div class="field">
-              <label>Supabase URL</label>
-              <input type="text" id="cfgSupabaseUrl" placeholder="https://xyzcompany.supabase.co">
-            </div>
-            <div class="field">
-              <label>Supabase Anon Key</label>
-              <input type="text" id="cfgSupabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
-            </div>
-            <div class="field">
-              <label>ID da Organização (UUID)</label>
-              <input type="text" id="cfgOrgId" placeholder="Copie da tabela organizations">
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">Dados da Empresa & Identidade</div>
-          <div class="form-grid">
-            <div class="field">
-              <label>Nome do Estabelecimento</label>
-              <input type="text" id="cfgOrgName" placeholder="Ex: Studio Bella Donna">
-            </div>
-            <div class="field">
-              <label>Nome da Unidade</label>
-              <input type="text" id="cfgUnitName" placeholder="Ex: Matriz Centro">
-            </div>
-            <div class="field">
-              <label>Cor Primária (Tema)</label>
-              <input type="color" id="cfgColor" value="#6941c6" style="height:40px; padding:2px;">
-            </div>
-            <div class="field">
-              <label>Telefone / WhatsApp de Contato</label>
-              <input type="text" id="cfgPhone" placeholder="(11) 99999-9999">
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head">Link Público de Autoatendimento</div>
-          <div style="padding: 20px;">
-            <p style="font-size:13px; color: var(--text-muted); margin-bottom: 12px;">Seus clientes podem agendar 24h por dia diretamente por este endereço:</p>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <input type="text" id="cfgPublicLink" readonly style="flex:1; min-width: 250px; height: 38px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; background: #faf9f7;">
-              <button class="btn-action" onclick="copyPublicLink()">Copiar Link</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    </div>
-  </div>
-
-  <!-- MODAL: AGENDAMENTO -->
-  <div class="modal-wrap" id="modalBooking">
-    <div class="modal">
-      <div class="modal-head">
-        <h3>Novo Agendamento</h3>
-        <button class="close-btn" onclick="closeModal('modalBooking')">&times;</button>
-      </div>
-      <form id="formBooking" onsubmit="handleCreateBooking(event)">
-        <div class="modal-body">
-          <div class="field">
-            <label>Selecione o Cliente</label>
-            <select id="bClientSelect" required>
-              <option value="">Nenhum cliente cadastrado</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Serviço</label>
-            <select id="bServiceSelect" required>
-              <option value="Corte e Finalização|12000">Corte e Finalização — R$ 120,00</option>
-              <option value="Manicure & Pedicure|6500">Manicure & Pedicure — R$ 65,00</option>
-              <option value="Coloração Completa|22000">Coloração Completa — R$ 220,00</option>
-              <option value="Design de Sobrancelha|5000">Design de Sobrancelha — R$ 50,00</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Profissional Designado</label>
-            <select id="bStaffSelect" required>
-              <option value="">Nenhum profissional cadastrado</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Data & Horário</label>
-            <input type="datetime-local" id="bDateTime" required>
-          </div>
-          <div class="field">
-            <label>Origem do Agendamento</label>
-            <select id="bOrigin">
-              <option value="internal">Agenda Interna</option>
-              <option value="google">Google Agenda (Espelhado)</option>
-              <option value="public_link">Autoatendimento Online</option>
-            </select>
-          </div>
-        </div>
-        <div class="modal-foot">
-          <button type="button" class="btn-action btn-secondary" onclick="closeModal('modalBooking')">Cancelar</button>
-          <button type="submit" class="btn-action">Salvar Reserva</button>
-        </div>
+        <button class="button primary full" id="authSubmit" type="submit">Entrar</button>
       </form>
+      <button class="switch-auth" id="switchAuth" type="button">Criar uma conta</button>
     </div>
-  </div>
+  </section>
 
-  <!-- MODAL: CADASTRAR CLIENTE -->
-  <div class="modal-wrap" id="modalClient">
-    <div class="modal">
-      <div class="modal-head">
-        <h3>Cadastrar Cliente</h3>
-        <button class="close-btn" onclick="closeModal('modalClient')">&times;</button>
+  <div id="app" class="shell hidden">
+    <aside>
+      <div class="brand"><span class="brand-mark">✦</span><span>AgendaPro</span></div>
+      <div>
+        <p class="nav-label">Menu principal</p>
+        <button class="nav-item active" type="button">▦ <span>Visão geral</span></button>
+        <button class="nav-item" type="button" id="sideNewBooking">＋ <span>Agendamentos</span></button>
+        <button class="nav-item" type="button" id="sideClients">♙ <span>Clientes</span></button>
       </div>
-      <form id="formClient" onsubmit="handleCreateClient(event)">
-        <div class="modal-body">
-          <div class="field">
-            <label>Nome Completo</label>
-            <input type="text" id="cName" required placeholder="Ex: Juliana Oliveira">
-          </div>
-          <div class="field">
-            <label>WhatsApp / Telefone</label>
-            <input type="tel" id="cPhone" required placeholder="(11) 98888-7777">
-          </div>
-          <div class="field">
-            <label>E-mail (opcional)</label>
-            <input type="email" id="cEmail" placeholder="cliente@email.com">
-          </div>
-        </div>
-        <div class="modal-foot">
-          <button type="button" class="btn-action btn-secondary" onclick="closeModal('modalClient')">Cancelar</button>
-          <button type="submit" class="btn-action">Cadastrar</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- MODAL: ANAMNESE DIGITAL -->
-  <div class="modal-wrap" id="modalAnamnese">
-    <div class="modal">
-      <div class="modal-head">
-        <h3>Ficha de Anamnese Digital</h3>
-        <button class="close-btn" onclick="closeModal('modalAnamnese')">&times;</button>
+      <div class="side-bottom">
+        <strong style="color:var(--text)">Seu espaço de trabalho</strong><br>
+        MVP conectado ao Supabase. Configure as políticas de segurança antes de usar com clientes reais.
       </div>
-      <form id="formAnamnese" onsubmit="handleCreateAnamnese(event)">
-        <div class="modal-body">
-          <div class="field">
-            <label>Selecione o Cliente</label>
-            <select id="aClientSelect" required></select>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Painel de controle</div>
+          <h1>Visão geral</h1>
+        </div>
+        <div class="top-actions">
+          <button class="button" id="logoutButton" type="button">Sair</button>
+          <button class="button primary" id="newBookingButton" type="button">＋ Novo agendamento</button>
+        </div>
+      </header>
+
+      <div id="appNotice" class="notice"></div>
+
+      <section class="stats" aria-label="Resumo dos agendamentos">
+        <article class="stat">
+          <div class="stat-label">Agendamentos de hoje</div>
+          <div class="stat-number" id="todayCount">—</div>
+          <div class="stat-hint">Atendimentos marcados para hoje</div>
+        </article>
+        <article class="stat">
+          <div class="stat-label">Próximos agendamentos</div>
+          <div class="stat-number" id="upcomingCount">—</div>
+          <div class="stat-hint">A partir de agora</div>
+        </article>
+        <article class="stat">
+          <div class="stat-label">Clientes cadastrados</div>
+          <div class="stat-number" id="clientsCount">—</div>
+          <div class="stat-hint">Na sua conta</div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Próximos agendamentos</h2>
+            <p>Seus atendimentos futuros</p>
           </div>
-          <div class="field">
-            <label>Alergias ou Hipersensibilidades Declaradas</label>
-            <input type="text" id="aAllergies" placeholder="Nenhuma ou especificar (ex: amônia, esmalte)">
-          </div>
-          <div class="field">
-            <label>Histórico Químico / Procedimentos Anteriores</label>
-            <textarea id="aHistory" placeholder="Ex: Descoloração recente, botox capilar há 2 meses..."></textarea>
-          </div>
-          <div class="field">
-            <label>Termo de Consentimento & Ciência</label>
-            <select id="aConsent">
-              <option value="true">Cliente ciente e aceitou as orientações</option>
-              <option value="false">Recusado</option>
-            </select>
+          <button class="button" id="refreshButton" type="button">Atualizar</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Serviço</th>
+                <th>Data e hora</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsTable"></tbody>
+          </table>
+          <div id="emptyState" class="empty hidden">
+            <strong>Nenhum agendamento por enquanto</strong>
+            Crie seu primeiro agendamento usando o botão acima.
           </div>
         </div>
-        <div class="modal-foot">
-          <button type="button" class="btn-action btn-secondary" onclick="closeModal('modalAnamnese')">Cancelar</button>
-          <button type="submit" class="btn-action">Registrar Ficha</button>
-        </div>
-      </form>
-    </div>
+      </section>
+    </main>
   </div>
 
-  <!-- MODAL: PROFISSIONAL & COMISSÃO -->
-  <div class="modal-wrap" id="modalStaff">
-    <div class="modal">
-      <div class="modal-head">
-        <h3>Novo Profissional & Comissão</h3>
-        <button class="close-btn" onclick="closeModal('modalStaff')">&times;</button>
-      <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div class="field">
-            <label>Nome do Profissional</label>
-            <input type="text" id="sName" required placeholder="Ex: Camila Silva">
-          </div>
-          <div class="field">
-            <label>Especialidade / Cargo</label>
-            <input type="text" id="sRole" required placeholder="Ex: Cabeleireira / Manicure">
-          </div>
-          <div class="field">
-            <label>Comissão sobre Serviços (%)</label>
-            <input type="number" id="sCommission" min="0" max="100" value="40" required>
-          </div>
-        </div>
-        <div class="modal-foot">
-          <button type="button" class="btn-action btn-secondary" onclick="closeModal('modalStaff')">Cancelar</button>
-          <button type="submit" class="btn-action">Salvar Profissional</button>
-        </div>
-      </form>
+  <dialog id="bookingDialog">
+    <div class="dialog-head">
+      <h2>Novo agendamento</h2>
+      <button class="close" id="closeDialog" type="button" aria-label="Fechar">×</button>
     </div>
-  </div>
+    <form id="bookingForm" class="dialog-body">
+      <div class="field">
+        <label for="clientName">Nome do cliente</label>
+        <input id="clientName" required maxlength="120" placeholder="Ex.: Ana Souza">
+      </div>
+      <div class="field">
+        <label for="clientPhone">Telefone (opcional)</label>
+        <input id="clientPhone" type="tel" maxlength="30" placeholder="Ex.: (11) 99999-9999">
+      </div>
+      <div class="field">
+        <label for="serviceName">Serviço</label>
+        <input id="serviceName" required maxlength="120" placeholder="Ex.: Corte">
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="bookingDate">Data</label>
+          <input id="bookingDate" type="date" required>
+        </div>
+        <div class="field">
+          <label for="bookingTime">Horário</label>
+          <input id="bookingTime" type="time" required>
+        </div>
+      </div>
+      <button class="button primary full" type="submit">Salvar agendamento</button>
+      <div class="footer-note">Este MVP salva os dados na sua conta autenticada do Supabase.</div>
+    </form>
+  </dialog>
 
-  <!-- JAVASCRIPT NATIVO: NAVEGAÇÃO, CLIQUES E PERSISTÊNCIA -->
-  <script>
-    // 1. Estado da aplicação em memória local
-    const db = {
-      org: JSON.parse(localStorage.getItem('bf_org') || '{"name":"BeautyFlow","unit":"Matriz Centro","color":"#6941c6"}'),
-      clients: JSON.parse(localStorage.getItem('bf_clients') || '[]'),
-      staff: JSON.parse(localStorage.getItem('bf_staff') || '[]'),
-      bookings: JSON.parse(localStorage.getItem('bf_bookings') || '[]'),
-      anamneses: JSON.parse(localStorage.getItem('bf_anamneses') || '[]')
-    };
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    function saveDB() {
-      localStorage.setItem('bf_org', JSON.stringify(db.org));
-      localStorage.setItem('bf_clients', JSON.stringify(db.clients));
-      localStorage.setItem('bf_staff', JSON.stringify(db.staff));
-      localStorage.setItem('bf_bookings', JSON.stringify(db.bookings));
-      localStorage.setItem('bf_anamneses', JSON.stringify(db.anamneses));
-      renderAll();
+    // Troque pelos dados do seu projeto em Supabase > Project Settings > API.
+    const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
+    const SUPABASE_ANON_KEY = "SUA_CHAVE_PUBLICA_ANON";
+
+    const isConfigured =
+      SUPABASE_URL !== "https://SEU-PROJETO.supabase.co" &&
+      SUPABASE_ANON_KEY !== "SUA_CHAVE_PUBLICA_ANON";
+
+    const supabase = isConfigured
+      ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
+    const $ = (id) => document.getElementById(id);
+    let isSignUp = false;
+    let currentUser = null;
+
+    function showNotice(element, message, type = "error") {
+      element.textContent = message;
+      element.className = `notice ${type}`;
     }
 
-    // 2. Controle de Modais
-    window.openModal = function(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.add('open');
-    };
-
-    window.closeModal = function(id) {
-      const modal = document.getElementById(id);
-      if (modal) modal.classList.remove('open');
-    };
-
-    // 3. Navegação entre as abas do menu lateral
-    function navigateTo(pageId) {
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.page === pageId);
-      });
-      document.querySelectorAll('.view-page').forEach(page => {
-        page.classList.toggle('active', page.id === 'page-' + pageId);
-      });
-
-      // Fecha o menu no celular caso esteja aberto
-      document.getElementById('sidebar')?.classList.remove('open');
-      document.getElementById('backdrop')?.classList.remove('active');
+    function clearNotice(element) {
+      element.textContent = "";
+      element.className = "notice";
     }
 
-    document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
-      btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+    function formatDate(dateString, timeString) {
+      const date = new Date(`${dateString}T${timeString || "00:00"}:00`);
+      return new Intl.DateTimeFormat("pt-BR", {
+        day: "2-digit", month: "short", year: "numeric",
+        hour: "2-digit", minute: "2-digit"
+      }).format(date);
+    }
+
+    function setLoggedIn(user) {
+      currentUser = user;
+      $("loginScreen").classList.add("hidden");
+      $("app").classList.remove("hidden");
+      loadDashboard();
+    }
+
+    function setLoggedOut() {
+      currentUser = null;
+      $("app").classList.add("hidden");
+      $("loginScreen").classList.remove("hidden");
+    }
+
+    function updateAuthForm() {
+      $("authTitle").textContent = isSignUp ? "Crie sua conta" : "Entre na sua conta";
+      $("authDescription").textContent = isSignUp
+        ? "Cadastre-se para começar a organizar seus atendimentos."
+        : "Acesse sua agenda e organize seus atendimentos em um só lugar.";
+      $("authSubmit").textContent = isSignUp ? "Criar conta" : "Entrar";
+      $("switchAuth").textContent = isSignUp
+        ? "Já tem uma conta? Entrar"
+        : "Criar uma conta";
+      $("password").autocomplete = isSignUp ? "new-password" : "current-password";
+    }
+
+    $("switchAuth").addEventListener("click", () => {
+      isSignUp = !isSignUp;
+      clearNotice($("authNotice"));
+      updateAuthForm();
     });
 
-    // 4. Menu sanduíche mobile
-    const btnToggle = document.getElementById('btnToggleMenu');
-    const sidebar = document.getElementById('sidebar');
-    const backdrop = document.getElementById('backdrop');
+    $("authForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearNotice($("authNotice"));
 
-    if (btnToggle && sidebar && backdrop) {
-      btnToggle.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-        backdrop.classList.toggle('active');
-      });
-      backdrop.addEventListener('click', () => {
-        sidebar.classList.remove('open');
-        backdrop.classList.remove('active');
-      });
-    }
-
-    // Botão "+ Agendar Horário" do cabeçalho
-    document.getElementById('btnOpenBookingModal')?.addEventListener('click', () => {
-      if (db.clients.length === 0) {
-        alert('Cadastre ao menos um cliente antes de abrir a agenda.');
-        navigateTo('clientes');
-        openModal('modalClient');
+      if (!supabase) {
+        showNotice($("authNotice"), "Configure SUPABASE_URL e SUPABASE_ANON_KEY no código antes de entrar.");
         return;
       }
-      if (db.staff.length === 0) {
-        alert('Cadastre ao menos um profissional da equipe primeiro.');
-        navigateTo('equipe');
-        openModal('modalStaff');
-        return;
-      }
-      openModal('modalBooking');
-    });
 
-    // 5. Handlers de formulários
-    window.handleCreateClient = function(e) {
-      e.preventDefault();
-      const name = document.getElementById('cName').value.trim();
-      const phone = document.getElementById('cPhone').value.trim();
-      const email = document.getElementById('cEmail').value.trim();
+      const email = $("email").value.trim();
+      const password = $("password").value;
+      $("authSubmit").disabled = true;
+      $("authSubmit").textContent = "Aguarde...";
 
-      if (!name || !phone) return;
-      db.clients.push({ id: Date.now(), name, phone, email });
-      saveDB();
-      e.target.reset();
-      closeModal('modalClient');
-      alert('Cliente cadastrado com sucesso!');
-    };
+      try {
+        const result = isSignUp
+          ? await supabase.auth.signUp({ email, password })
+          : await supabase.auth.signInWithPassword({ email, password });
 
-    window.handleCreateStaff = function(e) {
-      e.preventDefault();
-      const name = document.getElementById('sName').value.trim();
-      const role = document.getElementById('sRole').value.trim();
-      const commission = parseFloat(document.getElementById('sCommission').value) || 0;
+        if (result.error) throw result.error;
 
-      if (!name) return;
-      db.staff.push({ id: Date.now(), name, role, commission });
-      saveDB();
-      e.target.reset();
-      closeModal('modalStaff');
-      alert('Profissional registrado na equipe!');
-    };
-
-    window.handleCreateBooking = function(e) {
-      e.preventDefault();
-      const clientName = document.getElementById('bClientSelect').value;
-      const serviceRaw = document.getElementById('bServiceSelect').value;
-      const [serviceName, priceCents] = serviceRaw.split('|');
-      const staffRaw = document.getElementById('bStaffSelect').value;
-      const [staffName, staffComm] = staffRaw.split('|');
-      const dt = document.getElementById('bDateTime').value;
-      const origin = document.getElementById('bOrigin').value;
-
-      const price = parseFloat(priceCents) / 100;
-      const commAmount = (price * (parseFloat(staffComm) / 100));
-
-      db.bookings.push({
-        id: Date.now(),
-        client: clientName,
-        service: serviceName,
-        price,
-        commAmount,
-        staff: staffName,
-        datetime: dt,
-        origin
-      });
-
-      saveDB();
-      e.target.reset();
-      closeModal('modalBooking');
-      alert('Agendamento confirmado!');
-    };
-
-    window.handleCreateAnamnese = function(e) {
-      e.preventDefault();
-      const client = document.getElementById('aClientSelect').value;
-      const allergies = document.getElementById('aAllergies').value.trim() || 'Nenhuma';
-      const history = document.getElementById('aHistory').value.trim() || 'Sem histórico prévio';
-      const consent = document.getElementById('aConsent').value === 'true';
-
-      db.anamneses.push({
-        id: Date.now(),
-        client,
-        date: new Date().toLocaleDateString('pt-BR'),
-        allergies,
-        history,
-        consent
-      });
-
-      saveDB();
-      e.target.reset();
-      closeModal('modalAnamnese');
-      alert('Ficha de Anamnese vinculada ao cliente!');
-    };
-
-    // 6. Atualização visual de tabelas e contadores
-    function renderAll() {
-      // Identidade e tema
-      document.getElementById('sidebarOrgName').textContent = db.org.name;
-      document.getElementById('topbarUnitName').textContent = db.org.unit;
-      document.documentElement.style.setProperty('--primary', db.org.color);
-
-      // Métricas
-      document.getElementById('metricBookings').textContent = db.bookings.length;
-      document.getElementById('badgeAgenda').textContent = db.bookings.length;
-      document.getElementById('metricClients').textContent = db.clients.length;
-
-      const totalRevenue = db.bookings.reduce((acc, b) => acc + b.price, 0);
-      const totalComms = db.bookings.reduce((acc, b) => acc + b.commAmount, 0);
-      document.getElementById('metricRevenue').textContent = 'R$ ' + totalRevenue.toFixed(2).replace('.', ',');
-      document.getElementById('metricCommissions').textContent = 'R$ ' + totalComms.toFixed(2).replace('.', ',');
-
-      // Preenche selects dos modais
-      const bClientSelect = document.getElementById('bClientSelect');
-      const aClientSelect = document.getElementById('aClientSelect');
-      if (bClientSelect && aClientSelect) {
-        const clientOptions = db.clients.length
-          ? db.clients.map(c => `<option value="${c.name}">${c.name} (${c.phone})</option>`).join('')
-          : '<option value="">Nenhum cliente cadastrado</option>';
-        bClientSelect.innerHTML = clientOptions;
-        aClientSelect.innerHTML = clientOptions;
-      }
-
-      const bStaffSelect = document.getElementById('bStaffSelect');
-      if (bStaffSelect) {
-        bStaffSelect.innerHTML = db.staff.length
-          ? db.staff.map(s => `<option value="${s.name}|${s.commission}">${s.name} — ${s.role} (${s.commission}%)</option>`).join('')
-          : '<option value="">Nenhum profissional cadastrado</option>';
-      }
-
-      // Tabela do Dashboard
-      const dashTbody = document.getElementById('dashTableBody');
-      if (dashTbody) {
-        if (db.bookings.length === 0) {
-          dashTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum agendamento realizado ainda. Clique em "+ Agendar Horário".</td></tr>';
-        } else {
-          dashTbody.innerHTML = db.bookings.slice(-5).reverse().map(b => `
-            <tr>
-              <td><strong>${b.client}</strong></td>
-              <td>${b.service}</td>
-              <td>${b.datetime.replace('T', ' ')}</td>
-              <td>${b.staff}</td>
-              <td><span class="pill blue">${b.origin}</span></td>
-              <td><span class="pill">Confirmado</span></td>
-            </tr>
-          `).join('');
+        if (isSignUp && !result.data.session) {
+          showNotice($("authNotice"), "Conta criada. Confirme seu e-mail antes de entrar.", "success");
+        } else if (result.data.user) {
+          setLoggedIn(result.data.user);
         }
+      } catch (error) {
+        showNotice($("authNotice"), error.message || "Não foi possível autenticar.");
+      } finally {
+        $("authSubmit").disabled = false;
+        updateAuthForm();
+      }
+    });
+
+    $("logoutButton").addEventListener("click", async () => {
+      if (supabase) await supabase.auth.signOut();
+      setLoggedOut();
+    });
+
+    $("newBookingButton").addEventListener("click", () => $("bookingDialog").showModal());
+    $("sideNewBooking").addEventListener("click", () => $("bookingDialog").showModal());
+    $("closeDialog").addEventListener("click", () => $("bookingDialog").close());
+    $("refreshButton").addEventListener("click", loadDashboard);
+
+    $("sideClients").addEventListener("click", () => {
+      showNotice($("appNotice"), "O cadastro de clientes é criado junto com o primeiro agendamento neste MVP.", "success");
+    });
+
+    $("bookingForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearNotice($("appNotice"));
+
+      if (!supabase || !currentUser) {
+        showNotice($("appNotice"), "Entre na sua conta e configure o Supabase para salvar agendamentos.");
+        return;
       }
 
-      // Tabela da Agenda Completa
-      const agendaTbody = document.getElementById('agendaTableBody');
-      if (agendaTbody) {
-        agendaTbody.innerHTML = db.bookings.length === 0
-          ? '<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum agendamento registrado.</td></tr>'
-          : db.bookings.map(b => `
-            <tr>
-              <td>${b.datetime.replace('T', ' ')}</td>
-              <td><strong>${b.client}</strong></td>
-              <td>${b.service}</td>
-              <td>R$ ${b.price.toFixed(2)}</td>
-              <td>${b.staff}</td>
-              <td>R$ ${b.commAmount.toFixed(2)}</td>
-              <td><button class="btn-action btn-secondary" style="height:28px; padding:0 8px; font-size:11px;" onclick="cancelBooking(${b.id})">Desmarcar</button></td>
-            </tr>
-          `).join('');
-      }
+      const submitButton = $("bookingForm").querySelector('button[type="submit"]');
+      submitButton.disabled = true;
+      submitButton.textContent = "Salvando...";
 
-      // Tabela de Clientes
-      const clientsTbody = document.getElementById('clientsTableBody');
-      if (clientsTbody) {
-        clientsTbody.innerHTML = db.clients.length === 0
-          ? '<tr><td colspan="4" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum cliente cadastrado. Clique no botão acima para adicionar.</td></tr>'
-          : db.clients.map(c => `
-            <tr>
-              <td><strong>${c.name}</strong></td>
-              <td>${c.phone}</td>
-              <td>${c.email || '-'}</td>
-              <td><span class="pill">Ativo</span></td>
-            </tr>
-          `).join('');
-      }
+      try {
+        const clientName = $("clientName").value.trim();
+        const clientPhone = $("clientPhone").value.trim() || null;
 
-      // Tabela de Equipe
-      const staffTbody = document.getElementById('staffTableBody');
-      if (staffTbody) {
-        staffTbody.innerHTML = db.staff.length === 0
-          ? '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum profissional cadastrado. Adicione sua equipe acima.</td></tr>'
-          : db.staff.map(s => `
-            <tr>
-              <td><strong>${s.name}</strong></td>
-              <td>${s.role}</td>
-              <td>${s.commission}%</td>
-              <td><span class="pill blue">Agenda Interna</span></td>
-              <td><span class="pill">Ativo</span></td>
-            </tr>
-          `).join('');
-      }
+        // O banco associa cada registro ao usuário autenticado.
+        const { error } = await supabase.from("appointments").insert({
+          user_id: currentUser.id,
+          client_name: clientName,
+          client_phone: clientPhone,
+          service_name: $("serviceName").value.trim(),
+          appointment_date: $("bookingDate").value,
+          appointment_time: $("bookingTime").value,
+          status: "scheduled"
+        });
 
-      // Tabela de Anamnese
-      const anamneseTbody = document.getElementById('anamneseTableBody');
-      if (anamneseTbody) {
-        anamneseTbody.innerHTML = db.anamneses.length === 0
-          ? '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhuma ficha cadastrada ainda.</td></tr>'
-          : db.anamneses.map(a => `
-            <tr>
-              <td><strong>${a.client}</strong></td>
-              <td>${a.date}</td>
-              <td>${a.allergies}</td>
-              <td>${a.history}</td>
-              <td><span class="pill ${a.consent ? '' : 'orange'}">${a.consent ? 'Assinado' : 'Não Aceito'}</span></td>
-              <td><span class="pill blue">Ver Detalhes</span></td>
-            </tr>
-          `).join('');
+        if (error) throw error;
+
+        $("bookingForm").reset();
+        $("bookingDialog").close();
+        showNotice($("appNotice"), "Agendamento salvo com sucesso.", "success");
+        await loadDashboard();
+      } catch (error) {
+        showNotice($("appNotice"), error.message || "Não foi possível salvar o agendamento.");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Salvar agendamento";
+      }
+    });
+
+    async function loadDashboard() {
+      if (!supabase || !currentUser) return;
+
+      const today = new Date().toLocaleDateString("en-CA");
+      const nowIso = new Date().toISOString();
+
+      try {
+        const { data: appointments, error: appointmentsError } = await supabase
+          .from("appointments")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .gte("appointment_date", today)
+          .order("appointment_date", { ascending: true })
+          .order("appointment_time", { ascending: true });
+
+        if (appointmentsError) throw appointmentsError;
+
+        const { count, error: countError } = await supabase
+          .from("appointments")
+          .select("*", { count: "exact", head: true })
+          .eq("user_id", currentUser.id);
+
+        if (countError) throw countError;
+
+        const rows = appointments || [];
+        $("todayCount").textContent = rows.filter(row => row.appointment_date === today).length;
+        $("upcomingCount").textContent = rows.length;
+        $("clientsCount").textContent = count ?? 0;
+
+        const table = $("bookingsTable");
+        table.replaceChildren();
+
+        if (!rows.length) {
+          $("emptyState").classList.remove("hidden");
+          return;
+        }
+
+        $("emptyState").classList.add("hidden");
+
+        rows.slice(0, 20).forEach((booking) => {
+          const tr = document.createElement("tr");
+          const clientCell = document.createElement("td");
+          const serviceCell = document.createElement("td");
+          const dateCell = document.createElement("td");
+          const statusCell = document.createElement("td");
+
+          const name = document.createElement("div");
+          name.className = "client-name";
+          name.textContent = booking.client_name;
+          clientCell.appendChild(name);
+
+          if (booking.client_phone) {
+            const phone = document.createElement("div");
+            phone.className = "subtext";
+            phone.textContent = booking.client_phone;
+            clientCell.appendChild(phone);
+          }
+
+          serviceCell.textContent = booking.service_name;
+          dateCell.textContent = formatDate(booking.appointment_date, booking.appointment_time);
+
+          const badge = document.createElement("span");
+          badge.className = "badge";
+          badge.textContent = booking.status === "scheduled" ? "● Agendado" : booking.status;
+          statusCell.appendChild(badge);
+
+          tr.append(clientCell, serviceCell, dateCell, statusCell);
+          table.appendChild(tr);
+        });
+      } catch (error) {
+        showNotice($("appNotice"), error.message || "Não foi possível carregar os dados.");
       }
     }
 
-    window.cancelBooking = function(id) {
-      if (confirm('Deseja realmente cancelar este agendamento?')) {
-        db.bookings = db.bookings.filter(b => b.id !== id);
-        saveDB();
-      }
-    };
-
-    window.saveSettings = function() {
-      const name = document.getElementById('cfgOrgName')?.value.trim();
-      const unit = document.getElementById('cfgUnitName')?.value.trim();
-      const color = document.getElementById('cfgColor')?.value;
-
-      if (name) db.org.name = name;
-      if (unit) db.org.unit = unit;
-      if (color) db.org.color = color;
-
-      saveDB();
-      alert('Configurações visuais salvas!');
-    };
-
-    window.toggleGoogleSyncMode = function() {
-      const mode = document.getElementById('googleModeSelect')?.value;
-      const area = document.getElementById('googleConfigArea');
-      if (area) area.style.display = mode === 'google' ? 'block' : 'none';
-    };
-
-    window.saveGoogleSettings = function() {
-      alert('A sincronização bidirecional em tempo real com o Google Agenda requer conexão OAuth 2.0 via servidor backend.');
-    };
-
-    window.copyPublicLink = function() {
-      const link = location.origin + location.pathname + '?agendar=' + encodeURIComponent(db.org.name.toLowerCase().replace(/\s+/g, '-'));
-      navigator.clipboard.writeText(link).then(() => {
-        alert('Link público copiado: ' + link);
-      }).catch(() => {
-        prompt('Copie o seu link de agendamento:', link);
+    if (supabase) {
+      supabase.auth.getSession().then(({ data }) => {
+        if (data.session?.user) setLoggedIn(data.session.user);
       });
-    };
 
-    document.getElementById('btnShareBooking')?.addEventListener('click', window.copyPublicLink);
-
-    // Inicialização ao carregar a página
-    document.addEventListener('DOMContentLoaded', () => {
-      renderAll();
-      const cfgLink = document.getElementById('cfgPublicLink');
-      if (cfgLink) {
-        cfgLink.value = location.origin + location.pathname + '?agendar=' + encodeURIComponent(db.org.name.toLowerCase().replace(/\s+/g, '-'));
-      }
-    });
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) setLoggedIn(session.user);
+        else setLoggedOut();
+      });
+    } else {
+      showNotice($("authNotice"), "Para ativar o app, configure as credenciais do Supabase no código.");
+    }
   </script>
 </body>
-</html></body></html>
+</html>
