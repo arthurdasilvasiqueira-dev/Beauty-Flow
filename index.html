@@ -4,13 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f7f6f4">
-  <title>BeautyFlow Pro — Painel</title>
+  <title>BeautyFlow Pro — Painel de Gestão</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
     :root {
       --bg: #f7f6f4;
-      --surface: #fff;
+      --surface: #ffffff;
       --text: #26231f;
       --muted: #89847d;
       --line: #ebe8e4;
@@ -24,7 +24,7 @@
       --blue-light: #eaf1fa;
       --sidebar: 245px;
       --radius: 15px;
-      --shadow: 0 5px 20px #25211b08;
+      --shadow: 0 5px 20px rgba(37, 33, 27, 0.04);
     }
 
     * { box-sizing: border-box; }
@@ -114,7 +114,7 @@
     .topbar {
       position: sticky; top: 0; z-index: 10; height: 66px;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 30px; background: #ffffffed; border-bottom: 1px solid var(--line);
+      padding: 0 30px; background: rgba(255, 255, 255, 0.93); border-bottom: 1px solid var(--line);
       backdrop-filter: blur(12px);
     }
     .breadcrumb { color: var(--muted); font-size: 11px; }
@@ -140,7 +140,7 @@
       border-radius: 9px; background: white; font-size: 11px; font-weight: 600;
     }
     .btn:hover { background: #fbfaf9; }
-    .btn-primary { color: white; border-color: var(--purple); background: var(--purple); box-shadow: 0 4px 10px #7652c822; }
+    .btn-primary { color: white; border-color: var(--purple); background: var(--purple); box-shadow: 0 4px 10px rgba(118, 82, 200, 0.15); }
     .btn-primary:hover { background: #6240ad; }
     .btn-primary .plus { font-size: 17px; }
 
@@ -172,7 +172,7 @@
     .calendar-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-bottom: 1px solid var(--line); }
     .tabs { display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: #f4f3f1; }
     .tab { padding: 5px 8px; color: var(--muted); border: 0; border-radius: 6px; background: transparent; font-size: 9px; }
-    .tab.active { color: var(--text); background: white; box-shadow: 0 1px 3px #00000012; }
+    .tab.active { color: var(--text); background: white; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07); }
     .filter { color: #69645f; border: 0; background: transparent; font-size: 10px; }
 
     .calendar { padding: 0 13px 13px 55px; }
@@ -255,31 +255,22 @@
     .staff-count { text-align: right; font-size: 10px; font-weight: 700; }
     .staff-count small { display: block; margin-top: 3px; color: var(--muted); font-size: 8px; font-weight: 400; }
 
-    .page-view { display: none; }
-    .page-view.active { display: block; }
-    .simple-panel { padding: 23px; }
-    .simple-panel h2 { margin: 0 0 7px; font: 700 16px Manrope, sans-serif; }
-    .simple-panel p { color: var(--muted); font-size: 12px; line-height: 1.6; }
-    .empty-state { min-height: 180px; display: grid; place-items: center; padding: 20px; color: var(--muted); border: 1px dashed #dedbd6; border-radius: 13px; background: #fcfbfa; text-align: center; }
-    .empty-state span { display: block; margin-bottom: 8px; font-size: 25px; }
-    .empty-state strong { display: block; margin-bottom: 5px; color: var(--text); }
-
     .toast {
       position: fixed; right: 20px; bottom: 20px; z-index: 50;
       max-width: 330px; padding: 12px 15px; color: white; border-radius: 10px;
-      background: #29252f; box-shadow: 0 12px 35px #0003; font-size: 11px;
+      background: #29252f; box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2); font-size: 11px;
       opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
-    .backdrop { position: fixed; inset: 0; z-index: 30; display: none; background: #201c2760; }
+    .backdrop { position: fixed; inset: 0; z-index: 30; display: none; background: rgba(32, 28, 39, 0.38); }
     .backdrop.show { display: block; }
 
     .modal-backdrop {
       position: fixed; inset: 0; z-index: 60; display: none; place-items: center;
-      padding: 18px; background: #201c2770; backdrop-filter: blur(3px);
+      padding: 18px; background: rgba(32, 28, 39, 0.44); backdrop-filter: blur(3px);
     }
     .modal-backdrop.open { display: grid; }
-    .modal { width: min(430px, 100%); padding: 21px; border-radius: 16px; background: white; box-shadow: 0 25px 70px #0003; }
+    .modal { width: min(430px, 100%); padding: 21px; border-radius: 16px; background: white; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.2); }
     .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
     .modal-head h2 { margin: 0; font: 700 16px Manrope, sans-serif; }
     .modal-close { width: 29px; height: 29px; border: 0; border-radius: 8px; color: var(--muted); background: #f4f3f1; }
@@ -289,7 +280,7 @@
       width: 100%; min-height: 38px; padding: 0 10px;
       border: 1px solid var(--line); border-radius: 8px; outline: 0; background: white; font-size: 11px;
     }
-    .field input:focus, .field select:focus { border-color: #b5a1e3; box-shadow: 0 0 0 3px #7652c817; }
+    .field input:focus, .field select:focus { border-color: #b5a1e3; box-shadow: 0 0 0 3px rgba(118, 82, 200, 0.09); }
     .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 
     @media (max-width: 1050px) {
@@ -300,7 +291,7 @@
     }
     @media (max-width: 800px) {
       .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); box-shadow: 15px 0 40px #0002; }
+      .sidebar.open { transform: translateX(0); box-shadow: 15px 0 40px rgba(0, 0, 0, 0.13); }
       .main { margin-left: 0; }
       .menu-toggle { display: inline-block; }
       .top-left { display: flex; align-items: center; gap: 9px; }
@@ -348,7 +339,7 @@
       <div class="brand-name">Beauty<span>Flow</span> Pro</div>
     </div>
 
-    <button class="workspace" type="button" data-toast="Seletor de estabelecimento — prévia">
+    <button class="workspace" type="button" data-toast="Seletor de unidade — prévia">
       <span class="workspace-icon">L</span>
       <span class="workspace-copy"><strong>La Belle Studio</strong><small>Unidade Jardins</small></span>
       <span>⌄</span>
@@ -378,13 +369,13 @@
 
     <div class="sidebar-bottom">
       <div class="help">
-        <strong>Precisa de uma mão?</strong>
-        <p>Veja dicas e recursos para aproveitar melhor sua plataforma.</p>
-        <button type="button" data-toast="Central de ajuda — prévia">Acessar central de ajuda →</button>
+        <strong>Precisa de suporte?</strong>
+        <p>Acesse o guia rápido de implantação da sua conta.</p>
+        <button type="button" data-toast="Central de ajuda — prévia">Acessar documentação →</button>
       </div>
       <div class="profile">
         <div class="profile-avatar">MC</div>
-        <div><strong>Mariana Costa</strong><small>Proprietária</small></div>
+        <div><strong>Mariana Costa</strong><small>Administradora</small></div>
       </div>
     </div>
   </aside>
@@ -398,82 +389,23 @@
       <div class="top-actions">
         <button class="unit-button" type="button" data-toast="Unidade Jardins selecionada">⌖ &nbsp; Unidade Jardins &nbsp;⌄</button>
         <button class="icon-button help-button" type="button" aria-label="Ajuda" data-toast="Central de ajuda — prévia">?</button>
-        <button class="icon-button" type="button" aria-label="Notificações" data-toast="Você está em dia com as notificações">♧<span class="dot"></span></button>
+        <button class="icon-button" type="button" aria-label="Notificações" data-toast="Nenhum alerta pendente">♧<span class="dot"></span></button>
       </div>
     </header>
 
     <div class="content">
-      <section class="page-view active" id="page-dashboard">
+      <section class="page-view" id="page-dashboard">
         <div class="heading">
           <div>
-            <h1>Bom dia, Mariana ☀️</h1>
-            <p class="subtitle">Aqui está o resumo do seu estúdio para hoje, terça-feira, 14 de outubro.</p>
+            <h1>Painel Operacional</h1>
+            <p class="subtitle">Visão consolidada da operação de hoje — Unidade Jardins</p>
           </div>
           <div class="heading-actions">
-            <button class="btn" type="button" data-toast="Filtro de período: Hoje">◷ &nbsp; Hoje &nbsp;⌄</button>
+            <button class="btn" type="button" data-toast="Filtro aplicado: Hoje">◷ &nbsp; Hoje &nbsp;⌄</button>
             <button class="btn btn-primary" type="button" id="newAppointment"><span class="plus">+</span> Novo agendamento</button>
           </div>
         </div>
 
         <div class="metrics">
           <article class="metric">
-            <div class="metric-top"><span>Agendamentos de hoje</span><span class="metric-icon">▦</span></div>
-            <div class="metric-value">18</div>
-            <div class="metric-foot"><span class="trend">↑ 12%</span> em relação à semana passada</div>
-          </article>
-          <article class="metric">
-            <div class="metric-top"><span>Recebimentos do dia</span><span class="metric-icon green">R$</span></div>
-            <div class="metric-value">R$ 2.840</div>
-            <div class="metric-foot"><span class="trend">↑ 8,4%</span> em relação à semana passada</div>
-          </article>
-          <article class="metric">
-            <div class="metric-top"><span>Ocupação da agenda</span><span class="metric-icon orange">◷</span></div>
-            <div class="metric-value">76%</div>
-            <div class="metric-foot">14 horários disponíveis hoje</div>
-          </article>
-          <article class="metric">
-            <div class="metric-top"><span>Clientes atendidos</span><span class="metric-icon blue">♙</span></div>
-            <div class="metric-value">12</div>
-            <div class="metric-foot">De 18 agendamentos no total</div>
-          </article>
-        </div>
-
-        <div class="dashboard">
-          <section class="panel">
-            <div class="panel-heading">
-              <div><h2>Agenda da semana</h2><p>Acompanhe os atendimentos da sua equipe</p></div>
-              <div class="date-controls">
-                <button class="arrow" type="button" aria-label="Semana anterior">‹</button>
-                <span class="date-label" id="weekLabel">13 – 17 out, 2026</span>
-                <button class="arrow" type="button" aria-label="Próxima semana">›</button>
-              </div>
-            </div>
-            <div class="calendar-toolbar">
-              <div class="tabs" aria-label="Visualização da agenda">
-                <button class="tab active" type="button">Semana</button>
-                <button class="tab" type="button">Dia</button>
-                <button class="tab" type="button">Mês</button>
-                <button class="tab" type="button">Lista</button>
-              </div>
-              <button class="filter" type="button" data-toast="Filtro de profissionais — prévia">Todos os profissionais⌄</button>
-            </div>
-            <div class="calendar">
-              <div class="calendar-head">
-                <div class="calendar-day">SEG<strong>13</strong></div>
-                <div class="calendar-day today">TER<strong>14</strong></div>
-                <div class="calendar-day">QUA<strong>15</strong></div>
-                <div class="calendar-day">QUI<strong>16</strong></div>
-                <div class="calendar-day">SEX<strong>17</strong></div>
-              </div>
-              <div class="time-grid">
-                <div class="time-labels"><span>09:00</span><span>10:00</span><span>11:00</span><span>12:00</span><span>13:00</span><span>14:00</span><span>15:00</span><span>16:00</span><span>17:00</span></div>
-                <div class="columns">
-                  <div class="day-column">
-                    <div class="appointment" style="top:48px;height:69px"><strong>Escova + corte</strong><small>Laura M.</small></div>
-                    <div class="appointment mint" style="top:168px;height:55px"><strong>Manicure</strong><small>Camila R.</small></div>
-                    <div class="appointment peach" style="top:288px;height:74px"><strong>Coloração</strong><small>Laura M.</small></div>
-                  </div>
-                  <div class="day-column">
-                    <div class="appointment blue" style="top:24px;height:57px"><strong>Design sobrancelha</strong><small>Camila R.</small></div>
-                    <div class="appointment" style="top:96px;height:72px"><strong>Corte feminino</strong><small>Laura M.</small></div>
-                    <div class="appointment rose" style="top:192px;height:55px"><strong>Alongamento</strong><small>Beatriz S.</small
+            <div class="metric-top"><span>Agendamentos hoje</span><span class="
