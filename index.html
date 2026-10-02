@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BeautyFlow Pro — Gestão Completa & Agendamento</title>
+  <!-- Biblioteca Oficial do Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
 
@@ -29,7 +31,7 @@
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
     button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
-    /* BACKDROP */
+    /* BACKDROP MOBILE */
     .backdrop {
       position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 50;
       opacity: 0; pointer-events: none; transition: opacity .25s ease;
@@ -49,7 +51,7 @@
 
     .nav-list { list-style: none; padding: 12px 8px; display: flex; flex-direction: column; gap: 3px; flex: 1; overflow-y: auto; }
     .nav-btn {
-      width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+      width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px;
       background: transparent; border: 0; border-radius: 8px; font-size: 13px; font-weight: 600;
       color: #555; cursor: pointer; text-align: left; transition: background .15s;
     }
@@ -76,6 +78,7 @@
       background: var(--primary); color: #fff; border: 0; border-radius: 8px;
       padding: 0 14px; height: 36px; font-size: 12px; font-weight: 700; cursor: pointer;
       display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
+      transition: background .15s;
     }
     .btn-action:hover { background: var(--primary-hover); }
     .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
@@ -174,7 +177,7 @@
     <header class="topbar">
       <div class="top-left">
         <button class="menu-toggle" id="btnToggleMenu" aria-label="Abrir Menu">☰</button>
-        <span class="unit-tag">Unidade: <strong id="topbarUnitName">Configurar Unidade</strong></span>
+        <span class="unit-tag">Unidade: <strong id="topbarUnitName">Carregando...</strong></span>
       </div>
       <div class="top-right">
         <button class="btn-action btn-secondary" id="btnShareBooking" title="Copiar Link de Agendamento">
@@ -223,7 +226,7 @@
         <div class="panel">
           <div class="panel-head">
             <span>Próximos Agendamentos</span>
-            <button class="btn-action btn-secondary" onclick="document.querySelector('[data-page=agenda]').click()">Ver Agenda Completa</button>
+            <button class="btn-action btn-secondary" onclick="navigateTo('agenda')">Ver Agenda Completa</button>
           </div>
           <div class="table-responsive">
             <table>
@@ -252,7 +255,7 @@
             <h1>Agenda do Estabelecimento</h1>
             <p>Gerencie horários locais e visualize períodos sincronizados.</p>
           </div>
-          <button class="btn-action" onclick="openBookingModal()">+ Novo Agendamento</button>
+          <button class="btn-action" onclick="openModal('modalBooking')">+ Novo Agendamento</button>
         </div>
 
         <div class="panel">
@@ -271,7 +274,7 @@
                 </tr>
               </thead>
               <tbody id="agendaTableBody">
-                <!-- Inserido dinamicamente -->
+                <tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum agendamento registrado.</td></tr>
               </tbody>
             </table>
           </div>
@@ -322,7 +325,7 @@
             <h1>Base de Clientes & CRM</h1>
             <p>Histórico, preferências e cadastro unificado.</p>
           </div>
-          <button class="btn-action" onclick="openClientModal()">+ Cadastrar Cliente</button>
+          <button class="btn-action" onclick="openModal('modalClient')">+ Cadastrar Cliente</button>
         </div>
 
         <div class="panel">
@@ -334,12 +337,11 @@
                   <th>Nome Completo</th>
                   <th>Telefone / WhatsApp</th>
                   <th>E-mail</th>
-                  <th>Histórico</th>
                   <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="clientsTableBody">
-                <!-- Inserido dinamicamente -->
+                <tr><td colspan="4" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum cliente cadastrado. Clique no botão acima para adicionar.</td></tr>
               </tbody>
             </table>
           </div>
@@ -353,7 +355,7 @@
             <h1>Fichas de Anamnese Digital</h1>
             <p>Formulários de sensibilidade, histórico de procedimentos e termos de consentimento.</p>
           </div>
-          <button class="btn-action" onclick="openAnamneseModal()">+ Preencher Nova Ficha</button>
+          <button class="btn-action" onclick="openModal('modalAnamnese')">+ Preencher Nova Ficha</button>
         </div>
 
         <div class="panel">
@@ -371,7 +373,7 @@
                 </tr>
               </thead>
               <tbody id="anamneseTableBody">
-                <!-- Inserido dinamicamente -->
+                <tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhuma ficha cadastrada ainda.</td></tr>
               </tbody>
             </table>
           </div>
@@ -385,7 +387,7 @@
             <h1>Equipe & Regras de Comissões</h1>
             <p>Cadastre os profissionais e estabeleça as porcentagens de repasse financeiro.</p>
           </div>
-          <button class="btn-action" onclick="openStaffModal()">+ Cadastrar Profissional</button>
+          <button class="btn-action" onclick="openModal('modalStaff')">+ Cadastrar Profissional</button>
         </div>
 
         <div class="panel">
@@ -402,7 +404,7 @@
                 </tr>
               </thead>
               <tbody id="staffTableBody">
-                <!-- Inserido dinamicamente -->
+                <tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum profissional cadastrado. Adicione sua equipe acima.</td></tr>
               </tbody>
             </table>
           </div>
@@ -417,6 +419,24 @@
             <p>Configure a identidade visual do seu salão e copie o link público para seus clientes.</p>
           </div>
           <button class="btn-action" onclick="saveSettings()">Salvar Configurações</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">Configuração da Conexão Supabase</div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Supabase URL</label>
+              <input type="text" id="cfgSupabaseUrl" placeholder="https://xyzcompany.supabase.co">
+            </div>
+            <div class="field">
+              <label>Supabase Anon Key</label>
+              <input type="text" id="cfgSupabaseKey" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+            <div class="field">
+              <label>ID da Organização (UUID)</label>
+              <input type="text" id="cfgOrgId" placeholder="Copie da tabela organizations">
+            </div>
+          </div>
         </div>
 
         <div class="panel">
@@ -467,20 +487,24 @@
         <div class="modal-body">
           <div class="field">
             <label>Selecione o Cliente</label>
-            <select id="bClientSelect" required></select>
+            <select id="bClientSelect" required>
+              <option value="">Nenhum cliente cadastrado</option>
+            </select>
           </div>
           <div class="field">
             <label>Serviço</label>
-            <select id="bServiceSelect" required onchange="updateServicePrice()">
-              <option value="Corte e Finalização|120">Corte e Finalização — R$ 120,00</option>
-              <option value="Manicure & Pedicure|65">Manicure & Pedicure — R$ 65,00</option>
-              <option value="Coloração Completa|220">Coloração Completa — R$ 220,00</option>
-              <option value="Design de Sobrancelha|50">Design de Sobrancelha — R$ 50,00</option>
+            <select id="bServiceSelect" required>
+              <option value="Corte e Finalização|12000">Corte e Finalização — R$ 120,00</option>
+              <option value="Manicure & Pedicure|6500">Manicure & Pedicure — R$ 65,00</option>
+              <option value="Coloração Completa|22000">Coloração Completa — R$ 220,00</option>
+              <option value="Design de Sobrancelha|5000">Design de Sobrancelha — R$ 50,00</option>
             </select>
           </div>
           <div class="field">
             <label>Profissional Designado</label>
-            <select id="bStaffSelect" required></select>
+            <select id="bStaffSelect" required>
+              <option value="">Nenhum profissional cadastrado</option>
+            </select>
           </div>
           <div class="field">
             <label>Data & Horário</label>
@@ -489,9 +513,9 @@
           <div class="field">
             <label>Origem do Agendamento</label>
             <select id="bOrigin">
-              <option value="Sistema Interno">Agenda Interna</option>
-              <option value="Google Calendar">Google Agenda (Espelhado)</option>
-              <option value="Link do Cliente">Autoatendimento Online</option>
+              <option value="internal">Agenda Interna</option>
+              <option value="google">Google Agenda (Espelhado)</option>
+              <option value="public_link">Autoatendimento Online</option>
             </select>
           </div>
         </div>
@@ -557,8 +581,8 @@
           <div class="field">
             <label>Termo de Consentimento & Ciência</label>
             <select id="aConsent">
-              <option value="Aceito e Assinado Digitalmente">Cliente ciente e aceitou as orientações</option>
-              <option value="Recusado">Não aceito</option>
+              <option value="true">Cliente ciente e aceitou as orientações</option>
+              <option value="false">Recusado</option>
             </select>
           </div>
         </div>
@@ -577,20 +601,3 @@
         <h3>Novo Profissional & Comissão</h3>
         <button class="close-btn" onclick="closeModal('modalStaff')">&times;</button>
       </div>
-      <form id="formStaff" onsubmit="handleCreateStaff(event)">
-        <div class="modal-body">
-          <div class="field">
-            <label>Nome do Profissional</label>
-            <input type="text" id="sName" required placeholder="Ex: Camila Silva">
-          </div>
-          <div class="field">
-            <label>Especialidade</label>
-            <input type="text" id="sRole" required placeholder="Ex: Cabeleireira / Colorista">
-          </div>
-          <div class="field">
-            <label>Percentual de Comissão (%)</label>
-            <input type="number" id="sCommission" required min="0" max="100" value="40">
-          </div>
-          <div class="field">
-            <label>Conta Google Agenda Vinculada (Opcional)</label>
-            <input type="email" id="sGoogleAccount" placeholder="profissional@gmail.com">
