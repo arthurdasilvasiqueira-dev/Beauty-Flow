@@ -600,4 +600,360 @@
       <div class="modal-head">
         <h3>Novo Profissional & Comissão</h3>
         <button class="close-btn" onclick="closeModal('modalStaff')">&times;</button>
-      </div>
+      <!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body><div class="field">
+            <label>Nome do Profissional</label>
+            <input type="text" id="sName" required placeholder="Ex: Camila Silva">
+          </div>
+          <div class="field">
+            <label>Especialidade / Cargo</label>
+            <input type="text" id="sRole" required placeholder="Ex: Cabeleireira / Manicure">
+          </div>
+          <div class="field">
+            <label>Comissão sobre Serviços (%)</label>
+            <input type="number" id="sCommission" min="0" max="100" value="40" required>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn-action btn-secondary" onclick="closeModal('modalStaff')">Cancelar</button>
+          <button type="submit" class="btn-action">Salvar Profissional</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT NATIVO: NAVEGAÇÃO, CLIQUES E PERSISTÊNCIA -->
+  <script>
+    // 1. Estado da aplicação em memória local
+    const db = {
+      org: JSON.parse(localStorage.getItem('bf_org') || '{"name":"BeautyFlow","unit":"Matriz Centro","color":"#6941c6"}'),
+      clients: JSON.parse(localStorage.getItem('bf_clients') || '[]'),
+      staff: JSON.parse(localStorage.getItem('bf_staff') || '[]'),
+      bookings: JSON.parse(localStorage.getItem('bf_bookings') || '[]'),
+      anamneses: JSON.parse(localStorage.getItem('bf_anamneses') || '[]')
+    };
+
+    function saveDB() {
+      localStorage.setItem('bf_org', JSON.stringify(db.org));
+      localStorage.setItem('bf_clients', JSON.stringify(db.clients));
+      localStorage.setItem('bf_staff', JSON.stringify(db.staff));
+      localStorage.setItem('bf_bookings', JSON.stringify(db.bookings));
+      localStorage.setItem('bf_anamneses', JSON.stringify(db.anamneses));
+      renderAll();
+    }
+
+    // 2. Controle de Modais
+    window.openModal = function(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.add('open');
+    };
+
+    window.closeModal = function(id) {
+      const modal = document.getElementById(id);
+      if (modal) modal.classList.remove('open');
+    };
+
+    // 3. Navegação entre as abas do menu lateral
+    function navigateTo(pageId) {
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.page === pageId);
+      });
+      document.querySelectorAll('.view-page').forEach(page => {
+        page.classList.toggle('active', page.id === 'page-' + pageId);
+      });
+
+      // Fecha o menu no celular caso esteja aberto
+      document.getElementById('sidebar')?.classList.remove('open');
+      document.getElementById('backdrop')?.classList.remove('active');
+    }
+
+    document.querySelectorAll('.nav-btn[data-page]').forEach(btn => {
+      btn.addEventListener('click', () => navigateTo(btn.dataset.page));
+    });
+
+    // 4. Menu sanduíche mobile
+    const btnToggle = document.getElementById('btnToggleMenu');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+
+    if (btnToggle && sidebar && backdrop) {
+      btnToggle.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        backdrop.classList.toggle('active');
+      });
+      backdrop.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('active');
+      });
+    }
+
+    // Botão "+ Agendar Horário" do cabeçalho
+    document.getElementById('btnOpenBookingModal')?.addEventListener('click', () => {
+      if (db.clients.length === 0) {
+        alert('Cadastre ao menos um cliente antes de abrir a agenda.');
+        navigateTo('clientes');
+        openModal('modalClient');
+        return;
+      }
+      if (db.staff.length === 0) {
+        alert('Cadastre ao menos um profissional da equipe primeiro.');
+        navigateTo('equipe');
+        openModal('modalStaff');
+        return;
+      }
+      openModal('modalBooking');
+    });
+
+    // 5. Handlers de formulários
+    window.handleCreateClient = function(e) {
+      e.preventDefault();
+      const name = document.getElementById('cName').value.trim();
+      const phone = document.getElementById('cPhone').value.trim();
+      const email = document.getElementById('cEmail').value.trim();
+
+      if (!name || !phone) return;
+      db.clients.push({ id: Date.now(), name, phone, email });
+      saveDB();
+      e.target.reset();
+      closeModal('modalClient');
+      alert('Cliente cadastrado com sucesso!');
+    };
+
+    window.handleCreateStaff = function(e) {
+      e.preventDefault();
+      const name = document.getElementById('sName').value.trim();
+      const role = document.getElementById('sRole').value.trim();
+      const commission = parseFloat(document.getElementById('sCommission').value) || 0;
+
+      if (!name) return;
+      db.staff.push({ id: Date.now(), name, role, commission });
+      saveDB();
+      e.target.reset();
+      closeModal('modalStaff');
+      alert('Profissional registrado na equipe!');
+    };
+
+    window.handleCreateBooking = function(e) {
+      e.preventDefault();
+      const clientName = document.getElementById('bClientSelect').value;
+      const serviceRaw = document.getElementById('bServiceSelect').value;
+      const [serviceName, priceCents] = serviceRaw.split('|');
+      const staffRaw = document.getElementById('bStaffSelect').value;
+      const [staffName, staffComm] = staffRaw.split('|');
+      const dt = document.getElementById('bDateTime').value;
+      const origin = document.getElementById('bOrigin').value;
+
+      const price = parseFloat(priceCents) / 100;
+      const commAmount = (price * (parseFloat(staffComm) / 100));
+
+      db.bookings.push({
+        id: Date.now(),
+        client: clientName,
+        service: serviceName,
+        price,
+        commAmount,
+        staff: staffName,
+        datetime: dt,
+        origin
+      });
+
+      saveDB();
+      e.target.reset();
+      closeModal('modalBooking');
+      alert('Agendamento confirmado!');
+    };
+
+    window.handleCreateAnamnese = function(e) {
+      e.preventDefault();
+      const client = document.getElementById('aClientSelect').value;
+      const allergies = document.getElementById('aAllergies').value.trim() || 'Nenhuma';
+      const history = document.getElementById('aHistory').value.trim() || 'Sem histórico prévio';
+      const consent = document.getElementById('aConsent').value === 'true';
+
+      db.anamneses.push({
+        id: Date.now(),
+        client,
+        date: new Date().toLocaleDateString('pt-BR'),
+        allergies,
+        history,
+        consent
+      });
+
+      saveDB();
+      e.target.reset();
+      closeModal('modalAnamnese');
+      alert('Ficha de Anamnese vinculada ao cliente!');
+    };
+
+    // 6. Atualização visual de tabelas e contadores
+    function renderAll() {
+      // Identidade e tema
+      document.getElementById('sidebarOrgName').textContent = db.org.name;
+      document.getElementById('topbarUnitName').textContent = db.org.unit;
+      document.documentElement.style.setProperty('--primary', db.org.color);
+
+      // Métricas
+      document.getElementById('metricBookings').textContent = db.bookings.length;
+      document.getElementById('badgeAgenda').textContent = db.bookings.length;
+      document.getElementById('metricClients').textContent = db.clients.length;
+
+      const totalRevenue = db.bookings.reduce((acc, b) => acc + b.price, 0);
+      const totalComms = db.bookings.reduce((acc, b) => acc + b.commAmount, 0);
+      document.getElementById('metricRevenue').textContent = 'R$ ' + totalRevenue.toFixed(2).replace('.', ',');
+      document.getElementById('metricCommissions').textContent = 'R$ ' + totalComms.toFixed(2).replace('.', ',');
+
+      // Preenche selects dos modais
+      const bClientSelect = document.getElementById('bClientSelect');
+      const aClientSelect = document.getElementById('aClientSelect');
+      if (bClientSelect && aClientSelect) {
+        const clientOptions = db.clients.length
+          ? db.clients.map(c => `<option value="${c.name}">${c.name} (${c.phone})</option>`).join('')
+          : '<option value="">Nenhum cliente cadastrado</option>';
+        bClientSelect.innerHTML = clientOptions;
+        aClientSelect.innerHTML = clientOptions;
+      }
+
+      const bStaffSelect = document.getElementById('bStaffSelect');
+      if (bStaffSelect) {
+        bStaffSelect.innerHTML = db.staff.length
+          ? db.staff.map(s => `<option value="${s.name}|${s.commission}">${s.name} — ${s.role} (${s.commission}%)</option>`).join('')
+          : '<option value="">Nenhum profissional cadastrado</option>';
+      }
+
+      // Tabela do Dashboard
+      const dashTbody = document.getElementById('dashTableBody');
+      if (dashTbody) {
+        if (db.bookings.length === 0) {
+          dashTbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum agendamento realizado ainda. Clique em "+ Agendar Horário".</td></tr>';
+        } else {
+          dashTbody.innerHTML = db.bookings.slice(-5).reverse().map(b => `
+            <tr>
+              <td><strong>${b.client}</strong></td>
+              <td>${b.service}</td>
+              <td>${b.datetime.replace('T', ' ')}</td>
+              <td>${b.staff}</td>
+              <td><span class="pill blue">${b.origin}</span></td>
+              <td><span class="pill">Confirmado</span></td>
+            </tr>
+          `).join('');
+        }
+      }
+
+      // Tabela da Agenda Completa
+      const agendaTbody = document.getElementById('agendaTableBody');
+      if (agendaTbody) {
+        agendaTbody.innerHTML = db.bookings.length === 0
+          ? '<tr><td colspan="7" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum agendamento registrado.</td></tr>'
+          : db.bookings.map(b => `
+            <tr>
+              <td>${b.datetime.replace('T', ' ')}</td>
+              <td><strong>${b.client}</strong></td>
+              <td>${b.service}</td>
+              <td>R$ ${b.price.toFixed(2)}</td>
+              <td>${b.staff}</td>
+              <td>R$ ${b.commAmount.toFixed(2)}</td>
+              <td><button class="btn-action btn-secondary" style="height:28px; padding:0 8px; font-size:11px;" onclick="cancelBooking(${b.id})">Desmarcar</button></td>
+            </tr>
+          `).join('');
+      }
+
+      // Tabela de Clientes
+      const clientsTbody = document.getElementById('clientsTableBody');
+      if (clientsTbody) {
+        clientsTbody.innerHTML = db.clients.length === 0
+          ? '<tr><td colspan="4" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum cliente cadastrado. Clique no botão acima para adicionar.</td></tr>'
+          : db.clients.map(c => `
+            <tr>
+              <td><strong>${c.name}</strong></td>
+              <td>${c.phone}</td>
+              <td>${c.email || '-'}</td>
+              <td><span class="pill">Ativo</span></td>
+            </tr>
+          `).join('');
+      }
+
+      // Tabela de Equipe
+      const staffTbody = document.getElementById('staffTableBody');
+      if (staffTbody) {
+        staffTbody.innerHTML = db.staff.length === 0
+          ? '<tr><td colspan="5" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum profissional cadastrado. Adicione sua equipe acima.</td></tr>'
+          : db.staff.map(s => `
+            <tr>
+              <td><strong>${s.name}</strong></td>
+              <td>${s.role}</td>
+              <td>${s.commission}%</td>
+              <td><span class="pill blue">Agenda Interna</span></td>
+              <td><span class="pill">Ativo</span></td>
+            </tr>
+          `).join('');
+      }
+
+      // Tabela de Anamnese
+      const anamneseTbody = document.getElementById('anamneseTableBody');
+      if (anamneseTbody) {
+        anamneseTbody.innerHTML = db.anamneses.length === 0
+          ? '<tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhuma ficha cadastrada ainda.</td></tr>'
+          : db.anamneses.map(a => `
+            <tr>
+              <td><strong>${a.client}</strong></td>
+              <td>${a.date}</td>
+              <td>${a.allergies}</td>
+              <td>${a.history}</td>
+              <td><span class="pill ${a.consent ? '' : 'orange'}">${a.consent ? 'Assinado' : 'Não Aceito'}</span></td>
+              <td><span class="pill blue">Ver Detalhes</span></td>
+            </tr>
+          `).join('');
+      }
+    }
+
+    window.cancelBooking = function(id) {
+      if (confirm('Deseja realmente cancelar este agendamento?')) {
+        db.bookings = db.bookings.filter(b => b.id !== id);
+        saveDB();
+      }
+    };
+
+    window.saveSettings = function() {
+      const name = document.getElementById('cfgOrgName')?.value.trim();
+      const unit = document.getElementById('cfgUnitName')?.value.trim();
+      const color = document.getElementById('cfgColor')?.value;
+
+      if (name) db.org.name = name;
+      if (unit) db.org.unit = unit;
+      if (color) db.org.color = color;
+
+      saveDB();
+      alert('Configurações visuais salvas!');
+    };
+
+    window.toggleGoogleSyncMode = function() {
+      const mode = document.getElementById('googleModeSelect')?.value;
+      const area = document.getElementById('googleConfigArea');
+      if (area) area.style.display = mode === 'google' ? 'block' : 'none';
+    };
+
+    window.saveGoogleSettings = function() {
+      alert('A sincronização bidirecional em tempo real com o Google Agenda requer conexão OAuth 2.0 via servidor backend.');
+    };
+
+    window.copyPublicLink = function() {
+      const link = location.origin + location.pathname + '?agendar=' + encodeURIComponent(db.org.name.toLowerCase().replace(/\s+/g, '-'));
+      navigator.clipboard.writeText(link).then(() => {
+        alert('Link público copiado: ' + link);
+      }).catch(() => {
+        prompt('Copie o seu link de agendamento:', link);
+      });
+    };
+
+    document.getElementById('btnShareBooking')?.addEventListener('click', window.copyPublicLink);
+
+    // Inicialização ao carregar a página
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAll();
+      const cfgLink = document.getElementById('cfgPublicLink');
+      if (cfgLink) {
+        cfgLink.value = location.origin + location.pathname + '?agendar=' + encodeURIComponent(db.org.name.toLowerCase().replace(/\s+/g, '-'));
+      }
+    });
+  </script>
+</body>
+</html></body></html>
