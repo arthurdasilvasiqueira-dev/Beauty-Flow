@@ -2,15 +2,14 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BeautyFlow Pro — Painel de Gestão</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BeautyFlow Pro — Painel</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
 
     :root {
       --bg: #f8f7f5;
       --surface: #ffffff;
-      --surface-subtle: #f3f2ee;
       --text: #23201b;
       --text-muted: #7f7a72;
       --border: #e6e3dd;
@@ -21,762 +20,435 @@
       --success-light: #e6f6ee;
       --warning: #b54708;
       --warning-light: #fffaeb;
-      --info: #175cd3;
-      --info-light: #eff8ff;
-      --danger: #b42318;
-      --sidebar-width: 250px;
+      --sidebar-w: 240px;
       --radius: 12px;
-      --shadow-sm: 0 1px 3px rgba(16, 24, 40, 0.05);
-      --shadow-md: 0 4px 14px rgba(16, 24, 40, 0.08);
-      --shadow-lg: 0 12px 30px rgba(16, 24, 40, 0.14);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      display: flex;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
+    button, input, select { font-family: inherit; }
 
-    button, input, select, textarea {
-      font-family: inherit;
-      color: inherit;
+    /* OVERLAY MOBILE */
+    .backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 50;
+      opacity: 0; pointer-events: none; transition: opacity .2s ease;
     }
+    .backdrop.active { opacity: 1; pointer-events: auto; }
 
-    /* BARRA LATERAL */
+    /* SIDEBAR */
     .sidebar {
-      width: var(--sidebar-width);
-      background: var(--surface);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      z-index: 40;
-      transition: transform 0.25s ease;
+      width: var(--sidebar-w); background: var(--surface); border-right: 1px solid var(--border);
+      position: fixed; top: 0; bottom: 0; left: 0; z-index: 60;
+      display: flex; flex-direction: column; transition: transform .25s ease;
     }
-
-    .brand {
-      height: 70px;
-      padding: 0 20px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .brand-logo {
-      width: 36px;
-      height: 36px;
-      background: linear-gradient(135deg, var(--primary), #9e77ed);
-      color: #fff;
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 18px;
-      border-radius: 10px;
-      display: grid;
-      place-items: center;
-    }
-
-    .brand-title {
-      font-family: 'Manrope', sans-serif;
-      font-weight: 800;
-      font-size: 16px;
-      letter-spacing: -0.3px;
-    }
-
+    .brand { height: 64px; padding: 0 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+    .brand-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--primary); color: #fff; font-weight: 800; display: grid; place-items: center; }
+    .brand-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 15px; }
     .brand-title span { color: var(--primary); }
 
-    .nav-scroll {
-      flex: 1;
-      padding: 16px 12px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .nav-group-label {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--text-muted);
-      padding: 0 10px;
-      margin-bottom: 6px;
-    }
-
-    .nav-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-
+    .nav-list { list-style: none; padding: 14px 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
     .nav-btn {
-      width: 100%;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 9px 12px;
-      background: transparent;
-      border: 0;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      color: #475467;
-      cursor: pointer;
-      text-align: left;
-      transition: all 0.15s ease;
+      width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      background: transparent; border: 0; border-radius: 8px; font-size: 13px; font-weight: 600;
+      color: #555; cursor: pointer; text-align: left;
     }
+    .nav-btn:hover { background: #f2f1ed; color: var(--text); }
+    .nav-btn.active { background: var(--primary-light); color: var(--primary); }
+    .badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
 
-    .nav-btn:hover {
-      background: var(--surface-subtle);
-      color: var(--text);
-    }
-
-    .nav-btn.active {
-      background: var(--primary-light);
-      color: var(--primary);
-      font-weight: 700;
-    }
-
-    .nav-btn svg {
-      width: 18px;
-      height: 18px;
-      stroke-width: 2;
-      flex-shrink: 0;
-    }
-
-    .badge-count {
-      margin-left: auto;
-      background: var(--primary);
-      color: #fff;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 1px 7px;
-      border-radius: 12px;
-    }
-
-    .sidebar-footer {
-      padding: 16px;
-      border-top: 1px solid var(--border);
-      background: var(--surface);
-    }
-
-    .profile-card {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .profile-avatar {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: #dfc8b6;
-      color: #63381a;
-      font-weight: 700;
-      display: grid;
-      place-items: center;
-      font-size: 13px;
-    }
-
-    .profile-info strong {
-      display: block;
-      font-size: 13px;
-      color: var(--text);
-    }
-
-    .profile-info small {
-      font-size: 11px;
-      color: var(--text-muted);
-    }
-
-    /* CORPO PRINCIPAL */
-    .main-wrapper {
-      margin-left: var(--sidebar-width);
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-    }
-
+    /* LAYOUT PRINCIPAL */
+    .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-width: 0; }
     .topbar {
-      height: 70px;
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 0 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 30;
+      height: 64px; background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 40;
     }
-
-    .topbar-left {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
+    .top-left, .top-right { display: flex; align-items: center; gap: 10px; }
     .menu-toggle {
-      display: none;
-      background: transparent;
-      border: 1px solid var(--border);
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      cursor: pointer;
-      place-items: center;
+      display: none; background: transparent; border: 1px solid var(--border);
+      width: 36px; height: 36px; border-radius: 8px; cursor: pointer; font-size: 18px; place-items: center;
     }
-
-    .topbar-title {
-      font-size: 14px;
-      color: var(--text-muted);
-    }
-
-    .topbar-title strong {
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .topbar-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .unit-tag { font-size: 13px; color: var(--text-muted); }
+    .unit-tag strong { color: var(--text); }
 
     .btn-icon {
-      width: 38px;
-      height: 38px;
-      border: 1px solid var(--border);
-      background: var(--surface);
-      border-radius: 9px;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
-      position: relative;
-      color: #475467;
-      transition: background 0.15s;
+      width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px;
+      background: #fff; cursor: pointer; display: grid; place-items: center; position: relative;
     }
-
-    .btn-icon:hover { background: var(--surface-subtle); }
-
-    .btn-icon .dot {
-      position: absolute;
-      top: 7px;
-      right: 7px;
-      width: 7px;
-      height: 7px;
-      background: var(--danger);
-      border-radius: 50%;
-    }
-
-    .btn-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 0 16px;
-      height: 38px;
-      border-radius: 9px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.15s;
-    }
+    .btn-icon .dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #e03131; border-radius: 50%; }
 
     .btn-primary {
-      background: var(--primary);
-      color: #fff;
+      background: var(--primary); color: #fff; border: 0; border-radius: 8px;
+      padding: 0 14px; height: 36px; font-size: 12px; font-weight: 700; cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
     }
+    .btn-primary:active { transform: scale(0.98); }
 
-    .btn-primary:hover { background: var(--primary-hover); }
+    /* CONTEÚDO */
+    .content { padding: 20px; max-width: 1200px; width: 100%; margin: 0 auto; }
+    .view-page { display: none; }
+    .view-page.active { display: block; }
 
-    .btn-secondary {
-      background: var(--surface);
-      border-color: var(--border);
-      color: var(--text);
+    .page-title { margin-bottom: 18px; }
+    .page-title h1 { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
+    .page-title p { color: var(--text-muted); font-size: 12px; margin-top: 3px; }
+
+    /* METRICAS */
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .card-m { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+    .card-m small { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    .card-m .val { font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; margin: 6px 0; }
+    .card-m .tag { font-size: 11px; font-weight: 600; color: var(--success); }
+
+    /* LISTA DE AGENDAMENTOS */
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+    .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; }
+    .list-item {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
     }
-
-    .btn-secondary:hover { background: var(--surface-subtle); }
-
-    /* CONTEÚDO DINÂMICO */
-    .content-area {
-      padding: 28px;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    .view-section { display: none; }
-    .view-section.active { display: block; }
-
-    .page-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-      gap: 16px;
-    }
-
-    .page-header h1 {
-      font-family: 'Manrope', sans-serif;
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 4px;
-    }
-
-    .page-header p {
-      color: var(--text-muted);
-      font-size: 13px;
-    }
-
-    /* CARDS DE MÉTRICAS */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .metric-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      box-shadow: var(--shadow-sm);
-    }
-
-    .metric-card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      color: var(--text-muted);
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .metric-val {
-      font-family: 'Manrope', sans-serif;
-      font-size: 26px;
-      font-weight: 800;
-      margin: 10px 0 6px;
-      letter-spacing: -0.6px;
-    }
-
-    .metric-badge {
-      font-size: 11px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .metric-badge.green { color: var(--success); }
-    .metric-badge.orange { color: var(--warning); }
-
-    /* GRID DO PAINEL PRINCIPAL */
-    .dashboard-layout {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 20px;
-      align-items: start;
-    }
-
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow-sm);
-      overflow: hidden;
-    }
-
-    .card-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .card-header h2 {
-      font-family: 'Manrope', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-    }
-
-    /* AGENDA VISUAL */
-    .calendar-mockup {
-      padding: 16px;
-    }
-
-    .calendar-grid {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 8px;
-      border-top: 1px solid var(--border);
-      padding-top: 12px;
-    }
-
-    .cal-day-col {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .cal-day-header {
-      text-align: center;
-      font-size: 11px;
-      color: var(--text-muted);
-      font-weight: 700;
-      padding-bottom: 6px;
-      border-bottom: 2px solid transparent;
-    }
-
-    .cal-day-header.today {
-      color: var(--primary);
-      border-bottom-color: var(--primary);
-    }
-
-    .cal-slot {
-      background: var(--surface-subtle);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 11px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      cursor: pointer;
-      transition: transform 0.1s ease, border-color 0.15s ease;
-    }
-
-    .cal-slot:hover {
-      border-color: var(--primary);
-      transform: translateY(-1px);
-    }
-
-    .cal-slot.active-slot {
-      background: var(--primary-light);
-      border-color: #d6bbfb;
-      color: #5332a6;
-    }
-
-    .cal-slot strong {
-      font-size: 12px;
-      color: var(--text);
-    }
-
-    /* LISTA DE ATENDIMENTOS */
-    .appointment-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .appointment-item:last-child { border-bottom: 0; }
-
-    .appt-meta strong {
-      display: block;
-      font-size: 13px;
-      margin-bottom: 2px;
-    }
-
-    .appt-meta span {
-      font-size: 12px;
-      color: var(--text-muted);
-    }
-
-    .status-tag {
-      padding: 4px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .status-confirmed { background: var(--success-light); color: var(--success); }
-    .status-pending { background: var(--warning-light); color: var(--warning); }
+    .list-item:last-child { border-bottom: 0; }
+    .item-meta strong { display: block; font-size: 13px; margin-bottom: 3px; }
+    .item-meta span { font-size: 11px; color: var(--text-muted); }
+    .pill { padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; background: var(--success-light); color: var(--success); }
 
     /* MODAL */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(16, 24, 40, 0.5);
-      backdrop-filter: blur(4px);
-      z-index: 100;
-      display: none;
-      place-items: center;
-      padding: 20px;
+    .modal-wrap {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100;
+      display: none; place-items: center; padding: 16px;
     }
-
-    .modal-backdrop.open { display: grid; }
-
-    .modal-box {
-      background: var(--surface);
-      border-radius: 16px;
-      width: 100%;
-      max-width: 480px;
-      box-shadow: var(--shadow-lg);
-      overflow: hidden;
-      animation: modalIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    .modal-wrap.open { display: grid; }
+    .modal {
+      background: #fff; width: 100%; max-width: 420px; border-radius: 14px;
+      overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
     }
-
-    @keyframes modalIn {
-      from { opacity: 0; transform: scale(0.96); }
-      to { opacity: 1; transform: scale(1); }
+    .modal-head {
+      padding: 14px 18px; border-bottom: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
     }
+    .modal-head h3 { font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700; }
+    .close-btn { background: none; border: 0; font-size: 20px; cursor: pointer; color: var(--text-muted); }
 
-    .modal-header {
-      padding: 18px 22px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .modal-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
+    .field label { display: block; font-size: 11px; font-weight: 700; color: #444; margin-bottom: 4px; }
+    .field input, .field select {
+      width: 100%; height: 38px; border: 1px solid var(--border); border-radius: 8px;
+      padding: 0 10px; font-size: 13px; outline: none; background: #fff;
     }
+    .field input:focus, .field select:focus { border-color: var(--primary); }
 
-    .modal-header h3 {
-      font-family: 'Manrope', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
+    .modal-foot { padding: 12px 18px; background: #fbfbfa; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
+    .btn-cancel { background: transparent; border: 1px solid var(--border); padding: 0 12px; height: 34px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 320px; margin: 0 auto;
+      background: #1c1a1f; color: #fff; padding: 12px 16px; border-radius: 10px;
+      font-size: 12px; font-weight: 500; text-align: center; opacity: 0; transform: translateY(20px);
+      transition: all .25s ease; pointer-events: none; z-index: 200;
     }
+    .toast.show { opacity: 1; transform: translateY(0); }
 
-    .btn-close {
-      background: transparent;
-      border: 0;
-      font-size: 20px;
-      cursor: pointer;
-      color: var(--text-muted);
-    }
-
-    .modal-body {
-      padding: 22px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group label {
-      font-size: 12px;
-      font-weight: 600;
-      color: #344054;
-    }
-
-    .form-group input, .form-group select {
-      height: 40px;
-      padding: 0 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 13px;
-      outline: 0;
-      background: #fff;
-    }
-
-    .form-group input:focus, .form-group select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(105, 65, 198, 0.12);
-    }
-
-    .modal-footer {
-      padding: 16px 22px;
-      background: var(--surface-subtle);
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-
-    /* TOAST DE FEEDBACK */
-    .toast-box {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      background: #1d2939;
-      color: #fff;
-      padding: 12px 18px;
-      border-radius: 10px;
-      font-size: 13px;
-      box-shadow: var(--shadow-lg);
-      transform: translateY(60px);
-      opacity: 0;
-      transition: all 0.25s ease;
-      z-index: 200;
-      pointer-events: none;
-    }
-
-    .toast-box.show {
-      transform: translateY(0);
-      opacity: 1;
-    }
-
-    /* TABELAS PARA OUTRAS SEÇÕES */
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 13px;
-    }
-
-    .data-table th {
-      background: var(--surface-subtle);
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text-muted);
-      font-weight: 600;
-    }
-
-    .data-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid var(--border);
-      color: var(--text);
-    }
-
-    /* RESPONSIVIDADE */
-    @media (max-width: 900px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-
-      .sidebar.open {
-        transform: translateX(0);
-        box-shadow: var(--shadow-lg);
-      }
-
-      .main-wrapper {
-        margin-left: 0;
-      }
-
-      .menu-toggle {
-        display: grid;
-      }
-
-      .dashboard-layout {
-        grid-template-columns: 1fr;
-      }
+    /* RESPONSIVIDADE (CELULARES) */
+    @media (max-width: 800px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main { margin-left: 0; }
+      .menu-toggle { display: grid; }
+      .unit-tag { font-size: 11px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- BARRA LATERAL -->
+  <!-- Backdrop para clique fora no mobile -->
+  <div class="backdrop" id="backdrop"></div>
+
+  <!-- SIDEBAR NAVEGÁVEL -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="brand-logo">B</div>
+      <div class="brand-icon">B</div>
       <div class="brand-title">Beauty<span>Flow</span> Pro</div>
     </div>
 
-    <div class="nav-scroll">
-      <div>
-        <div class="nav-group-label">Menu Principal</div>
-        <ul class="nav-list">
-          <li>
-            <button class="nav-btn active" data-page="dashboard">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg>
-              Visão Geral
-            </button>
-          </li>
-          <li>
-            <button class="nav-btn" data-page="agenda">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
-              Agenda
-              <span class="badge-count" id="agendaBadge">5</span>
-            </button>
-          </li>
-          <li>
-            <button class="nav-btn" data-page="clientes">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-              Clientes
-            </button>
-          </li>
-          <li>
-            <button class="nav-btn" data-page="servicos">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>
-              Serviços
-            </button>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <div class="nav-group-label">Gestão</div>
-        <ul class="nav-list">
-          <li>
-            <button class="nav-btn" data-page="financeiro">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-              Financeiro
-            </button>
-          </li>
-          <li>
-            <button class="nav-btn" data-page="configuracoes">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-              Configurações
-            </button>
-          </li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="sidebar-footer">
-      <div class="profile-card">
-        <div class="profile-avatar">MC</div>
-        <div class="profile-info">
-          <strong>Mariana Costa</strong>
-          <small>Administradora</small>
-        </div>
-      </div>
-    </div>
+    <ul class="nav-list">
+      <li><button class="nav-btn active" data-page="dash">📊 Visão Geral</button></li>
+      <li><button class="nav-btn" data-page="agenda">📅 Agenda <span class="badge" id="badgeTotal">3</span></button></li>
+      <li><button class="nav-btn" data-page="clientes">👥 Clientes</button></li>
+      <li><button class="nav-btn" data-page="financeiro">💳 Financeiro</button></li>
+      <li><button class="nav-btn" data-page="config">⚙️ Configurações</button></li>
+    </ul>
   </aside>
 
   <!-- ÁREA DE OPERAÇÃO -->
-  <div class="main-wrapper">
+  <div class="main">
     <header class="topbar">
-      <div class="topbar-left">
-        <button class="menu-toggle" id="btnToggleMenu" aria-label="Abrir Menu">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" x2="21" y1="6" y2="6"/><line x1="3" x2="21" y1="12" y2="12"/><line x1="3" x2="21" y1="18" y2="18"/></svg>
-        </button>
-        <div class="topbar-title">Estabelecimento: <strong>Unidade Jardins</strong></div>
+      <div class="top-left">
+        <button class="menu-toggle" id="btnToggleMenu" aria-label="Abrir Menu">☰</button>
+        <span class="unit-tag">Unidade: <strong>Jardins</strong></span>
       </div>
-
-      <div class="topbar-right">
+      <div class="top-right">
         <button class="btn-icon" id="btnNotif" aria-label="Notificações">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-          <span class="dot"></span>
+          🔔<span class="dot"></span>
         </button>
-        <button class="btn-action btn-primary" id="btnOpenModal">
+        <button class="btn-primary" id="btnOpenModal">
           <span>+</span> Novo Agendamento
         </button>
       </div>
     </header>
 
-    <div class="content-area">
-      
-      <!-- 1. DASHBOARD -->
-      <section class="view-section active" id="view-dashboard">
-        <div class="page-header">
-          <div>
-            <h1>Painel de Controle</h1>
-            <p>Resumo em tempo real da sua operação e atendimentos.</p>
+    <div class="content">
+
+      <!-- PÁGINA: DASHBOARD -->
+      <section class="view-page active" id="page-dash">
+        <div class="page-title">
+          <h1>Painel de Controle</h1>
+          <p>Visão em tempo real das marcações de hoje.</p>
+        </div>
+
+        <div class="metrics">
+          <div class="card-m">
+            <small>Atendimentos Hoje</small>
+            <div class="val" id="metricCount">3</div>
+            <span class="tag">↑ 100% online</span>
+          </div>
+          <div class="card-m">
+            <small>Faturamento Estimado</small>
+            <div class="val" id="metricTotal">R$ 290</div>
+            <span class="tag">Atualizado agora</span>
+          </div>
+          <div class="card-m">
+            <small>Ocupação</small>
+            <div class="val">65%</div>
+            <span class="tag">4 vagas livres</span>
           </div>
         </div>
 
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-card-top">Atendimentos Hoje</div>
-            <div class="metric-val" id="metricCount">5</div>
-            <div class="metric-badge green">↑ 12% vs. semana anterior</div>
+        <div class="panel">
+          <div class="panel-head">Atendimentos Agendados para Hoje</div>
+          <div id="appointmentsList">
+            <div class="list-item">
+              <div class="item-meta">
+                <strong>Mariana Silva — Corte e Escova</strong>
+                <span>09:30 • Profissional: Camila</span>
+              </div>
+              <span class="pill">Confirmado</span>
+            </div>
+            <div class="list-item">
+              <div class="item-meta">
+                <strong>Juliana Freitas — Manicure Completa</strong>
+                <span>11:00 • Profissional: Beatriz</span>
+              </div>
+              <span class="pill">Confirmado</span>
+            </div>
+            <div class="list-item">
+              <div class="item-meta">
+                <strong>Carla Souza — Design de Sobrancelha</strong>
+                <span>14:00 • Profissional: Camila</span>
+              </div>
+              <span class="pill">Confirmado</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA: AGENDA -->
+      <section class="view-page" id="page-agenda">
+        <div class="page-title">
+          <h1>Agenda Semanal</h1>
+          <p>Sincronizada com o Google Calendar em tempo real.</p>
+        </div>
+        <div class="panel" style="padding: 24px; text-align: center; color: var(--text-muted);">
+          Visualização detalhada da grade semanal liberada. Use o botão <strong>+ Novo Agendamento</strong> para adicionar horários.
+        </div>
+      </section>
+
+      <!-- PÁGINA: CLIENTES -->
+      <section class="view-page" id="page-clientes">
+        <div class="page-title">
+          <h1>Base de Clientes</h1>
+          <p>Contatos e fichas de anamnese digital.</p>
+        </div>
+        <div class="panel" style="padding: 24px; text-align: center; color: var(--text-muted);">
+          3 clientes ativos cadastrados nesta unidade.
+        </div>
+      </section>
+
+      <!-- PÁGINA: FINANCEIRO -->
+      <section class="view-page" id="page-financeiro">
+        <div class="page-title">
+          <h1>Financeiro & Comissões</h1>
+          <p>Fluxo de caixa diário e repasses.</p>
+        </div>
+        <div class="panel" style="padding: 24px; text-align: center; color: var(--text-muted);">
+          Caixa aberto. Total registrado hoje: <strong>R$ 290,00</strong>.
+        </div>
+      </section>
+
+      <!-- PÁGINA: CONFIGURAÇÕES -->
+      <section class="view-page" id="page-config">
+        <div class="page-title">
+          <h1>Configurações da Unidade</h1>
+          <p>Preferências, horários e equipe.</p>
+        </div>
+        <div class="panel" style="padding: 24px; text-align: center; color: var(--text-muted);">
+          Integração com Google Calendar: <strong>Conectado via OAuth</strong>.
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <!-- MODAL DE NOVO AGENDAMENTO -->
+  <div class="modal-wrap" id="modalBooking">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Novo Agendamento</h3>
+        <button class="close-btn" id="btnCloseModal">&times;</button>
+      </div>
+      <form id="formBooking">
+        <div class="modal-body">
+          <div class="field">
+            <label>Nome do Cliente</label>
+            <input type="text" id="inputClient" placeholder="Ex: Fernanda Lima" required>
+          </div>
+          <div class="field">
+            <label>Serviço</label>
+            <select id="selectService">
+              <option value="Corte e Escova|120">Corte e Escova (R$ 120)</option>
+              <option value="Manicure|50">Manicure (R$ 50)</option>
+              <option value="Design de Sobrancelha|45">Design de Sobrancelha (R$ 45)</option>
+              <option value="Coloração Global|200">Coloração Global (R$ 200)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Horário</label>
+            <input type="time" id="inputTime" value="15:30" required>
+          </div>
+          <div class="field">
+            <label>Profissional</label>
+            <select id="selectStaff">
+              <option>Camila (Cabelo)</option>
+              <option>Beatriz (Unhas)</option>
+              <option>Laura (Estética)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn-cancel" id="btnCancelModal">Cancelar</button>
+          <button type="submit" class="btn-primary">Salvar Reserva</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NOTIFICAÇÃO TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- JAVASCRIPT EXECUTÁVEL COMPLETO -->
+  <script>
+    // ELEMENTOS
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('backdrop');
+    const btnToggleMenu = document.getElementById('btnToggleMenu');
+    const modal = document.getElementById('modalBooking');
+    const btnOpenModal = document.getElementById('btnOpenModal');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const btnCancelModal = document.getElementById('btnCancelModal');
+    const formBooking = document.getElementById('formBooking');
+    const toast = document.getElementById('toast');
+    const appointmentsList = document.getElementById('appointmentsList');
+    const metricCount = document.getElementById('metricCount');
+    const badgeTotal = document.getElementById('badgeTotal');
+    const metricTotal = document.getElementById('metricTotal');
+    const btnNotif = document.getElementById('btnNotif');
+
+    let totalAppointments = 3;
+    let revenueTotal = 290;
+
+    // MOSTRAR TOAST
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+
+    // ABRIR/FECHAR MENU MOBILE
+    function toggleMobileMenu() {
+      const isOpen = sidebar.classList.toggle('open');
+      backdrop.classList.toggle('active', isOpen);
+    }
+
+    btnToggleMenu.addEventListener('click', toggleMobileMenu);
+    backdrop.addEventListener('click', () => {
+      sidebar.classList.remove('open');
+      backdrop.classList.remove('active');
+    });
+
+    // TROCA DE PÁGINAS (TABS)
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.view-page').forEach(p => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        const targetPage = document.getElementById('page-' + btn.dataset.page);
+        if (targetPage) targetPage.classList.add('active');
+
+        // Fecha menu no celular se estiver aberto
+        sidebar.classList.remove('open');
+        backdrop.classList.remove('active');
+      });
+    });
+
+    // CONTROLE DO MODAL
+    function openModal() { modal.classList.add('open'); }
+    function closeModal() { modal.classList.remove('open'); formBooking.reset(); }
+
+    btnOpenModal.addEventListener('click', openModal);
+    btnCloseModal.addEventListener('click', closeModal);
+    btnCancelModal.addEventListener('click', closeModal);
+
+    // ADICIONAR NOVO AGENDAMENTO
+    formBooking.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const client = document.getElementById('inputClient').value.trim();
+      const serviceRaw = document.getElementById('selectService').value;
+      const [serviceName, servicePrice] = serviceRaw.split('|');
+      const time = document.getElementById('inputTime').value;
+      const staff = document.getElementById('selectStaff').value;
+
+      if (!client) return;
+
+      // Cria item na lista
+      const item = document.createElement('div');
+      item.className = 'list-item';
+      item.innerHTML = `
+        <div class="item-meta">
+          <strong>${client} — ${serviceName}</strong>
+          <span>${time} • Profissional: ${staff.split(' ')[0]}</span>
+        </div>
+        <span class="pill">Confirmado</span>
+      `;
+      appointmentsList.prepend(item);
+
+      // Atualiza contadores
+      totalAppointments++;
+      revenueTotal += parseInt(servicePrice, 10);
+
+      metricCount.textContent = totalAppointments;
+      badgeTotal.textContent = totalAppointments;
+      metricTotal.textContent = 'R$ ' + revenueTotal;
+
+      closeModal();
+      showToast('✅ Agendamento de ' + client + ' registrado!');
+    });
+
+    // BOTÃO DE NOTIFICAÇÃO
+    btnNotif.addEventListener('click', () => {
+      showToast('🔔 Nenhuma pendência crítica para esta unidade.');
+    });
+  </script>
+</body>
+</html>
