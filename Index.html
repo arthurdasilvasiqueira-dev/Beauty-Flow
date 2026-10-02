@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f6f4">
+  <title>BeautyFlow Pro — Painel</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+
+    :root {
+      --bg: #f7f6f4;
+      --surface: #fff;
+      --text: #26231f;
+      --muted: #89847d;
+      --line: #ebe8e4;
+      --purple: #7652c8;
+      --purple-light: #f0ebfb;
+      --green: #26815f;
+      --green-light: #e7f4ed;
+      --orange: #b77134;
+      --orange-light: #fff1e1;
+      --blue: #4d77ac;
+      --blue-light: #eaf1fa;
+      --sidebar: 245px;
+      --radius: 15px;
+      --shadow: 0 5px 20px #25211b08;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background: var(--bg);
+      font: 14px "DM Sans", sans-serif;
+    }
+    button, input, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .sidebar {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 20;
+      width: var(--sidebar);
+      display: flex;
+      flex-direction: column;
+      padding: 22px 15px 16px;
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      transition: transform .2s ease;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 3px 9px 23px; }
+    .brand-icon {
+      width: 36px; height: 36px; display: grid; place-items: center;
+      color: white; border-radius: 11px;
+      background: linear-gradient(140deg, #a184e7, #6743b8);
+      font: 800 17px Manrope, sans-serif;
+    }
+    .brand-name { font: 800 15px Manrope, sans-serif; letter-spacing: -.4px; }
+    .brand-name span { color: var(--purple); }
+
+    .workspace {
+      display: flex; align-items: center; gap: 9px;
+      margin: 0 3px 23px; padding: 10px;
+      text-align: left; border: 1px solid var(--line);
+      border-radius: 11px; background: #f8f7f5;
+    }
+    .workspace-icon {
+      width: 33px; height: 33px; display: grid; place-items: center;
+      color: #96654a; background: #f2e8df; border-radius: 9px; font-weight: 700;
+    }
+    .workspace-copy { flex: 1; }
+    .workspace-copy strong, .workspace-copy small { display: block; }
+    .workspace-copy strong { font-size: 11px; }
+    .workspace-copy small { margin-top: 3px; color: var(--muted); font-size: 10px; }
+    .workspace > span:last-child { color: var(--muted); }
+
+    .nav-label {
+      margin: 0 9px 8px; color: #a19b94;
+      font-size: 9px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .nav { display: grid; gap: 3px; }
+    .nav-item {
+      display: flex; align-items: center; gap: 11px; width: 100%;
+      padding: 10px 11px; border: 0; border-radius: 9px;
+      color: #625d57; background: transparent; text-align: left;
+    }
+    .nav-item:hover { background: #f7f6f4; }
+    .nav-item.active { color: #6242ad; background: var(--purple-light); font-weight: 700; }
+    .nav-icon { width: 17px; text-align: center; font-size: 15px; }
+    .nav-count { margin-left: auto; color: var(--muted); font-size: 10px; }
+    .nav-section { margin-top: 22px; }
+
+    .sidebar-bottom { margin-top: auto; }
+    .help {
+      margin: 12px 3px 15px; padding: 13px;
+      border: 1px solid #e9e2f5; border-radius: 12px;
+      background: linear-gradient(140deg, #fbf9ff, #f3effb);
+    }
+    .help strong { font-size: 11px; }
+    .help p { margin: 6px 0 9px; color: #77717d; font-size: 10px; line-height: 1.5; }
+    .help button { padding: 0; color: #6544b0; border: 0; background: none; font-size: 10px; font-weight: 700; }
+    .profile { display: flex; align-items: center; gap: 9px; padding: 13px 5px 0; border-top: 1px solid var(--line); }
+    .profile-avatar {
+      width: 34px; height: 34px; display: grid; place-items: center;
+      color: white; border-radius: 50%; background: linear-gradient(140deg, #d59776, #a65b52);
+      font-size: 10px; font-weight: 700;
+    }
+    .profile strong, .profile small { display: block; }
+    .profile strong { font-size: 11px; }
+    .profile small { margin-top: 3px; color: var(--muted); font-size: 10px; }
+
+    .main { min-height: 100vh; margin-left: var(--sidebar); }
+    .topbar {
+      position: sticky; top: 0; z-index: 10; height: 66px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 30px; background: #ffffffed; border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(12px);
+    }
+    .breadcrumb { color: var(--muted); font-size: 11px; }
+    .breadcrumb strong { color: var(--text); }
+    .top-actions { display: flex; gap: 8px; }
+    .icon-button, .unit-button {
+      height: 35px; border: 1px solid var(--line); border-radius: 9px;
+      color: #68625c; background: white;
+    }
+    .icon-button { position: relative; width: 36px; }
+    .unit-button { padding: 0 11px; font-size: 11px; }
+    .dot { position: absolute; top: 6px; right: 7px; width: 6px; height: 6px; border-radius: 50%; background: #df6a72; }
+    .menu-toggle { display: none; }
+
+    .content { max-width: 1450px; margin: auto; padding: 28px 30px 45px; }
+    .heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 15px; margin-bottom: 21px; }
+    h1 { margin: 0 0 5px; font: 800 24px Manrope, sans-serif; letter-spacing: -.7px; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 12px; }
+    .heading-actions { display: flex; gap: 8px; }
+    .btn {
+      min-height: 37px; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      padding: 0 12px; color: #514c46; border: 1px solid var(--line);
+      border-radius: 9px; background: white; font-size: 11px; font-weight: 600;
+    }
+    .btn:hover { background: #fbfaf9; }
+    .btn-primary { color: white; border-color: var(--purple); background: var(--purple); box-shadow: 0 4px 10px #7652c822; }
+    .btn-primary:hover { background: #6240ad; }
+    .btn-primary .plus { font-size: 17px; }
+
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 13px; margin-bottom: 16px; }
+    .metric, .panel { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+    .metric { padding: 16px 17px; }
+    .metric-top { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 11px; }
+    .metric-icon { width: 29px; height: 29px; display: grid; place-items: center; color: var(--purple); background: var(--purple-light); border-radius: 9px; }
+    .metric-icon.green { color: var(--green); background: var(--green-light); }
+    .metric-icon.orange { color: var(--orange); background: var(--orange-light); }
+    .metric-icon.blue { color: var(--blue); background: var(--blue-light); }
+    .metric-value { margin: 10px 0 4px; font: 800 24px Manrope, sans-serif; letter-spacing: -.7px; }
+    .metric-foot { color: var(--muted); font-size: 10px; }
+    .trend { color: var(--green); font-weight: 700; }
+
+    .dashboard { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(270px, .85fr); gap: 14px; align-items: start; }
+    .panel-heading {
+      min-height: 61px; display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; padding: 13px 16px; border-bottom: 1px solid var(--line);
+    }
+    .panel-heading h2 { margin: 0; font: 700 13px Manrope, sans-serif; }
+    .panel-heading p { margin: 4px 0 0; color: var(--muted); font-size: 10px; }
+    .date-controls { display: flex; align-items: center; gap: 7px; }
+    .arrow {
+      width: 27px; height: 27px; color: #6e6963;
+      border: 1px solid var(--line); border-radius: 7px; background: white;
+    }
+    .date-label { min-width: 95px; text-align: center; font-size: 10px; font-weight: 700; }
+    .calendar-toolbar { display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-bottom: 1px solid var(--line); }
+    .tabs { display: flex; gap: 2px; padding: 3px; border-radius: 8px; background: #f4f3f1; }
+    .tab { padding: 5px 8px; color: var(--muted); border: 0; border-radius: 6px; background: transparent; font-size: 9px; }
+    .tab.active { color: var(--text); background: white; box-shadow: 0 1px 3px #00000012; }
+    .filter { color: #69645f; border: 0; background: transparent; font-size: 10px; }
+
+    .calendar { padding: 0 13px 13px 55px; }
+    .calendar-head { display: grid; grid-template-columns: repeat(5, 1fr); border-bottom: 1px solid var(--line); }
+    .calendar-day { padding: 11px 2px; color: var(--muted); border-left: 1px solid #f2f0ed; text-align: center; font-size: 9px; }
+    .calendar-day strong { display: block; margin-top: 5px; color: var(--text); font: 700 12px Manrope, sans-serif; }
+    .calendar-day.today strong { width: 24px; height: 24px; display: grid; place-items: center; margin: 2px auto 0; color: white; border-radius: 50%; background: var(--purple); }
+    .time-grid {
+      position: relative; height: 380px;
+      background: repeating-linear-gradient(to bottom, transparent 0, transparent 46px, #f0eeeb 47px, #f0eeeb 48px);
+    }
+    .time-labels {
+      position: absolute; top: -7px; left: -43px; height: 100%;
+      display: flex; flex-direction: column; justify-content: space-between;
+      color: #99948e; font-size: 8px;
+    }
+    .columns { display: grid; grid-template-columns: repeat(5, 1fr); height: 100%; }
+    .day-column { position: relative; border-left: 1px solid #f2f0ed; }
+    .appointment {
+      position: absolute; left: 3px; right: 3px; min-height: 43px; overflow: hidden;
+      padding: 6px; border-left: 3px solid var(--purple); border-radius: 6px;
+      color: #51416e; background: #f0eafa; font-size: 8px; line-height: 1.4;
+    }
+    .appointment strong, .appointment small { display: block; }
+    .appointment small { margin-top: 3px; opacity: .78; font-size: 7px; }
+    .appointment.mint { color: #28694f; border-color: #44a17c; background: #e8f5ee; }
+    .appointment.peach { color: #8a572d; border-color: #d58c51; background: #fff0e2; }
+    .appointment.blue { color: #3d608a; border-color: #6796cb; background: #e9f1fb; }
+    .appointment.rose { color: #8c4e56; border-color: #d47b84; background: #fbecef; }
+
+    .side-stack { display: grid; gap: 14px; }
+    .today-list { padding: 2px 16px 6px; }
+    .appointment-row {
+      min-height: 59px; display: grid; grid-template-columns: 40px 3px minmax(0, 1fr) auto;
+      align-items: center; gap: 8px; border-bottom: 1px solid #f1efec;
+    }
+    .appointment-row:last-child { border-bottom: 0; }
+    .row-time { color: #76716b; font-size: 10px; font-weight: 600; }
+    .row-color { width: 3px; height: 32px; border-radius: 3px; background: var(--purple); }
+    .row-color.mint { background: #44a17c; }
+    .row-color.peach { background: #d58c51; }
+    .row-info { min-width: 0; }
+    .row-info strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; }
+    .row-info small { display: block; margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .status { padding: 4px 6px; color: var(--green); border-radius: 20px; background: var(--green-light); font-size: 8px; font-weight: 700; white-space: nowrap; }
+    .status.pending { color: var(--orange); background: var(--orange-light); }
+    .status.progress { color: var(--blue); background: var(--blue-light); }
+
+    .quick-actions { padding: 12px 14px 14px; }
+    .quick-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .quick-action { min-height: 62px; padding: 9px; border: 1px solid var(--line); border-radius: 10px; background: white; text-align: left; }
+    .quick-action:hover { border-color: #d7c9f0; background: #fcfaff; }
+    .quick-action span { display: block; margin-bottom: 6px; font-size: 16px; }
+    .quick-action strong { font-size: 9px; }
+
+    .lower-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 14px; margin-top: 14px; }
+    .revenue { padding: 15px 18px 16px; }
+    .revenue-total { display: flex; align-items: baseline; gap: 9px; }
+    .revenue-total strong { font: 800 23px Manrope, sans-serif; }
+    .revenue-total span { color: var(--green); font-size: 9px; font-weight: 700; }
+    .chart {
+      height: 102px; display: flex; align-items: end; justify-content: space-around; gap: 10px;
+      margin-top: 13px; border-bottom: 1px solid var(--line);
+      background: repeating-linear-gradient(to bottom, transparent 0, transparent 32px, #f4f2ef 33px);
+    }
+    .bar-wrap { height: 100%; width: 24px; display: flex; align-items: end; }
+    .bar { width: 100%; border-radius: 5px 5px 0 0; background: #dfd5f4; }
+    .bar.active { background: var(--purple); }
+    .chart-labels { display: flex; justify-content: space-around; padding-top: 7px; color: #99948e; font-size: 8px; }
+    .staff-list { padding: 2px 16px 5px; }
+    .staff-row { min-height: 49px; display: flex; align-items: center; gap: 9px; border-bottom: 1px solid #f1efec; }
+    .staff-row:last-child { border-bottom: 0; }
+    .avatar { width: 29px; height: 29px; display: grid; place-items: center; color: white; border-radius: 50%; background: linear-gradient(140deg,#d59776,#a65b52); font-size: 9px; font-weight: 700; }
+    .avatar.green { background: linear-gradient(140deg,#84b49b,#4d8970); }
+    .avatar.blue { background: linear-gradient(140deg,#849fc5,#526d9a); }
+    .staff-details { flex: 1; }
+    .staff-details strong, .staff-details small { display: block; }
+    .staff-details strong { font-size: 10px; }
+    .staff-details small { margin-top: 3px; color: var(--muted); font-size: 9px; }
+    .staff-count { text-align: right; font-size: 10px; font-weight: 700; }
+    .staff-count small { display: block; margin-top: 3px; color: var(--muted); font-size: 8px; font-weight: 400; }
+
+    .page-view { display: none; }
+    .page-view.active { display: block; }
+    .simple-panel { padding: 23px; }
+    .simple-panel h2 { margin: 0 0 7px; font: 700 16px Manrope, sans-serif; }
+    .simple-panel p { color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .empty-state { min-height: 180px; display: grid; place-items: center; padding: 20px; color: var(--muted); border: 1px dashed #dedbd6; border-radius: 13px; background: #fcfbfa; text-align: center; }
+    .empty-state span { display: block; margin-bottom: 8px; font-size: 25px; }
+    .empty-state strong { display: block; margin-bottom: 5px; color: var(--text); }
+
+    .toast {
+      position: fixed; right: 20px; bottom: 20px; z-index: 50;
+      max-width: 330px; padding: 12px 15px; color: white; border-radius: 10px;
+      background: #29252f; box-shadow: 0 12px 35px #0003; font-size: 11px;
+      opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .backdrop { position: fixed; inset: 0; z-index: 30; display: none; background: #201c2760; }
+    .backdrop.show { display: block; }
+
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 60; display: none; place-items: center;
+      padding: 18px; background: #201c2770; backdrop-filter: blur(3px);
+    }
+    .modal-backdrop.open { display: grid; }
+    .modal { width: min(430px, 100%); padding: 21px; border-radius: 16px; background: white; box-shadow: 0 25px 70px #0003; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .modal-head h2 { margin: 0; font: 700 16px Manrope, sans-serif; }
+    .modal-close { width: 29px; height: 29px; border: 0; border-radius: 8px; color: var(--muted); background: #f4f3f1; }
+    .field { margin-bottom: 12px; }
+    .field label { display: block; margin-bottom: 5px; color: #5f5a54; font-size: 10px; font-weight: 700; }
+    .field input, .field select {
+      width: 100%; min-height: 38px; padding: 0 10px;
+      border: 1px solid var(--line); border-radius: 8px; outline: 0; background: white; font-size: 11px;
+    }
+    .field input:focus, .field select:focus { border-color: #b5a1e3; box-shadow: 0 0 0 3px #7652c817; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+
+    @media (max-width: 1050px) {
+      :root { --sidebar: 215px; }
+      .content { padding: 24px 20px 36px; }
+      .topbar { padding: 0 20px; }
+      .dashboard { grid-template-columns: minmax(0, 1.4fr) minmax(250px, .9fr); }
+    }
+    @media (max-width: 800px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); box-shadow: 15px 0 40px #0002; }
+      .main { margin-left: 0; }
+      .menu-toggle { display: inline-block; }
+      .top-left { display: flex; align-items: center; gap: 9px; }
+      .dashboard { grid-template-columns: 1fr; }
+      .side-stack { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 580px) {
+      .topbar { height: 58px; padding: 0 12px; }
+      .content { padding: 20px 12px 30px; }
+      .heading { flex-direction: column; margin-bottom: 16px; }
+      h1 { font-size: 21px; }
+      .heading-actions { width: 100%; }
+      .heading-actions > * { flex: 1; }
+      .metrics { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .metric { padding: 12px; }
+      .metric-value { font-size: 20px; }
+      .metric-top { font-size: 9px; }
+      .metric-foot { font-size: 8px; }
+      .side-stack, .lower-grid { grid-template-columns: 1fr; }
+      .calendar { padding-left: 44px; padding-right: 7px; }
+      .time-labels { left: -35px; font-size: 7px; }
+      .calendar-day { font-size: 7px; }
+      .calendar-day strong { font-size: 10px; }
+      .appointment { left: 2px; right: 2px; padding: 4px; font-size: 6px; }
+      .appointment strong { font-size: 6px; }
+      .appointment small { font-size: 5px; }
+      .calendar-toolbar { padding: 9px; }
+      .tab { padding: 5px 6px; font-size: 8px; }
+      .panel-heading { padding: 12px; }
+      .unit-button, .top-actions .help-button { display: none; }
+      .breadcrumb { font-size: 10px; }
+      .date-label { min-width: 83px; font-size: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="backdrop" id="backdrop"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">B</div>
+      <div class="brand-name">Beauty<span>Flow</span> Pro</div>
+    </div>
+
+    <button class="workspace" type="button" data-toast="Seletor de estabelecimento — prévia">
+      <span class="workspace-icon">L</span>
+      <span class="workspace-copy"><strong>La Belle Studio</strong><small>Unidade Jardins</small></span>
+      <span>⌄</span>
+    </button>
+
+    <div class="nav-label">Menu principal</div>
+    <nav class="nav" aria-label="Menu principal">
+      <button class="nav-item active" data-page="dashboard"><span class="nav-icon">◫</span> Visão geral</button>
+      <button class="nav-item" data-page="agenda"><span class="nav-icon">▦</span> Agenda <span class="nav-count">12</span></button>
+      <button class="nav-item" data-page="clientes"><span class="nav-icon">♙</span> Clientes</button>
+      <button class="nav-item" data-page="servicos"><span class="nav-icon">✦</span> Serviços</button>
+      <button class="nav-item" data-page="equipe"><span class="nav-icon">♧</span> Equipe</button>
+    </nav>
+
+    <div class="nav-label nav-section">Gestão</div>
+    <nav class="nav" aria-label="Gestão">
+      <button class="nav-item" data-page="financeiro"><span class="nav-icon">▤</span> Financeiro</button>
+      <button class="nav-item" data-page="estoque"><span class="nav-icon">▣</span> Estoque</button>
+      <button class="nav-item" data-page="relatorios"><span class="nav-icon">▥</span> Relatórios</button>
+    </nav>
+
+    <div class="nav-label nav-section">Preferências</div>
+    <nav class="nav" aria-label="Preferências">
+      <button class="nav-item" data-page="integracoes"><span class="nav-icon">⟳</span> Integrações</button>
+      <button class="nav-item" data-page="configuracoes"><span class="nav-icon">⚙</span> Configurações</button>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="help">
+        <strong>Precisa de uma mão?</strong>
+        <p>Veja dicas e recursos para aproveitar melhor sua plataforma.</p>
+        <button type="button" data-toast="Central de ajuda — prévia">Acessar central de ajuda →</button>
+      </div>
+      <div class="profile">
+        <div class="profile-avatar">MC</div>
+        <div><strong>Mariana Costa</strong><small>Proprietária</small></div>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="top-left">
+        <button class="icon-button menu-toggle" id="menuToggle" aria-label="Abrir menu">☰</button>
+        <div class="breadcrumb">La Belle Studio <span style="margin:0 6px;color:#c3beb8">/</span> <strong id="breadcrumbTitle">Visão geral</strong></div>
+      </div>
+      <div class="top-actions">
+        <button class="unit-button" type="button" data-toast="Unidade Jardins selecionada">⌖ &nbsp; Unidade Jardins &nbsp;⌄</button>
+        <button class="icon-button help-button" type="button" aria-label="Ajuda" data-toast="Central de ajuda — prévia">?</button>
+        <button class="icon-button" type="button" aria-label="Notificações" data-toast="Você está em dia com as notificações">♧<span class="dot"></span></button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-view active" id="page-dashboard">
+        <div class="heading">
+          <div>
+            <h1>Bom dia, Mariana ☀️</h1>
+            <p class="subtitle">Aqui está o resumo do seu estúdio para hoje, terça-feira, 14 de outubro.</p>
+          </div>
+          <div class="heading-actions">
+            <button class="btn" type="button" data-toast="Filtro de período: Hoje">◷ &nbsp; Hoje &nbsp;⌄</button>
+            <button class="btn btn-primary" type="button" id="newAppointment"><span class="plus">+</span> Novo agendamento</button>
+          </div>
+        </div>
+
+        <div class="metrics">
+          <article class="metric">
+            <div class="metric-top"><span>Agendamentos de hoje</span><span class="metric-icon">▦</span></div>
+            <div class="metric-value">18</div>
+            <div class="metric-foot"><span class="trend">↑ 12%</span> em relação à semana passada</div>
+          </article>
+          <article class="metric">
+            <div class="metric-top"><span>Recebimentos do dia</span><span class="metric-icon green">R$</span></div>
+            <div class="metric-value">R$ 2.840</div>
+            <div class="metric-foot"><span class="trend">↑ 8,4%</span> em relação à semana passada</div>
+          </article>
+          <article class="metric">
+            <div class="metric-top"><span>Ocupação da agenda</span><span class="metric-icon orange">◷</span></div>
+            <div class="metric-value">76%</div>
+            <div class="metric-foot">14 horários disponíveis hoje</div>
+          </article>
+          <article class="metric">
+            <div class="metric-top"><span>Clientes atendidos</span><span class="metric-icon blue">♙</span></div>
+            <div class="metric-value">12</div>
+            <div class="metric-foot">De 18 agendamentos no total</div>
+          </article>
+        </div>
+
+        <div class="dashboard">
+          <section class="panel">
+            <div class="panel-heading">
+              <div><h2>Agenda da semana</h2><p>Acompanhe os atendimentos da sua equipe</p></div>
+              <div class="date-controls">
+                <button class="arrow" type="button" aria-label="Semana anterior">‹</button>
+                <span class="date-label" id="weekLabel">13 – 17 out, 2026</span>
+                <button class="arrow" type="button" aria-label="Próxima semana">›</button>
+              </div>
+            </div>
+            <div class="calendar-toolbar">
+              <div class="tabs" aria-label="Visualização da agenda">
+                <button class="tab active" type="button">Semana</button>
+                <button class="tab" type="button">Dia</button>
+                <button class="tab" type="button">Mês</button>
+                <button class="tab" type="button">Lista</button>
+              </div>
+              <button class="filter" type="button" data-toast="Filtro de profissionais — prévia">Todos os profissionais⌄</button>
+            </div>
+            <div class="calendar">
+              <div class="calendar-head">
+                <div class="calendar-day">SEG<strong>13</strong></div>
+                <div class="calendar-day today">TER<strong>14</strong></div>
+                <div class="calendar-day">QUA<strong>15</strong></div>
+                <div class="calendar-day">QUI<strong>16</strong></div>
+                <div class="calendar-day">SEX<strong>17</strong></div>
+              </div>
+              <div class="time-grid">
+                <div class="time-labels"><span>09:00</span><span>10:00</span><span>11:00</span><span>12:00</span><span>13:00</span><span>14:00</span><span>15:00</span><span>16:00</span><span>17:00</span></div>
+                <div class="columns">
+                  <div class="day-column">
+                    <div class="appointment" style="top:48px;height:69px"><strong>Escova + corte</strong><small>Laura M.</small></div>
+                    <div class="appointment mint" style="top:168px;height:55px"><strong>Manicure</strong><small>Camila R.</small></div>
+                    <div class="appointment peach" style="top:288px;height:74px"><strong>Coloração</strong><small>Laura M.</small></div>
+                  </div>
+                  <div class="day-column">
+                    <div class="appointment blue" style="top:24px;height:57px"><strong>Design sobrancelha</strong><small>Camila R.</small></div>
+                    <div class="appointment" style="top:96px;height:72px"><strong>Corte feminino</strong><small>Laura M.</small></div>
+                    <div class="appointment rose" style="top:192px;height:55px"><strong>Alongamento</strong><small>Beatriz S.</small
