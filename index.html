@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#10111a">
-  <title>AgendaPro — Gestão de agendamentos</title>
+  <title>Beauty Flow — Gestão de agendamentos</title>
 
   <style>
     :root {
@@ -141,7 +141,6 @@
     .button:hover { background: var(--surface-2); }
     .button.primary { border-color: transparent; color: #191329; background: var(--primary); }
     .button.primary:hover { background: var(--primary-hover); }
-    .button.danger { color: var(--red); }
 
     .stats {
       display: grid;
@@ -234,7 +233,7 @@
     .field { display: grid; gap: 7px; margin: 14px 0; }
     .field label { color: var(--muted); font-size: 12px; font-weight: 650; }
 
-    .field input, .field select {
+    .field input {
       width: 100%;
       min-height: 43px;
       padding: 10px 12px;
@@ -245,7 +244,7 @@
       background: #131520;
     }
 
-    .field input:focus, .field select:focus { border-color: var(--primary); }
+    .field input:focus { border-color: var(--primary); }
     .full { width: 100%; margin-top: 8px; }
     .switch-auth { display: block; margin: 17px auto 0; border: 0; color: var(--primary); background: transparent; }
     .hidden { display: none !important; }
@@ -294,7 +293,7 @@
     <div class="login-card">
       <div class="brand" style="padding:0;margin-bottom:22px">
         <span class="brand-mark">✦</span>
-        <span>AgendaPro</span>
+        <span>Beauty Flow</span>
       </div>
       <h1 id="authTitle">Entre na sua conta</h1>
       <p id="authDescription">Acesse sua agenda e organize seus atendimentos em um só lugar.</p>
@@ -316,7 +315,7 @@
 
   <div id="app" class="shell hidden">
     <aside>
-      <div class="brand"><span class="brand-mark">✦</span><span>AgendaPro</span></div>
+      <div class="brand"><span class="brand-mark">✦</span><span>Beauty Flow</span></div>
       <div>
         <p class="nav-label">Menu principal</p>
         <button class="nav-item active" type="button">▦ <span>Visão geral</span></button>
@@ -426,7 +425,7 @@
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    // Troque pelos dados do seu projeto em Supabase > Project Settings > API.
+    // Substitua pelos dados do seu projeto em Supabase > Project Settings > API.
     const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
     const SUPABASE_ANON_KEY = "SUA_CHAVE_PUBLICA_ANON";
 
@@ -556,7 +555,6 @@
         const clientName = $("clientName").value.trim();
         const clientPhone = $("clientPhone").value.trim() || null;
 
-        // O banco associa cada registro ao usuário autenticado.
         const { error } = await supabase.from("appointments").insert({
           user_id: currentUser.id,
           client_name: clientName,
@@ -585,7 +583,6 @@
       if (!supabase || !currentUser) return;
 
       const today = new Date().toLocaleDateString("en-CA");
-      const nowIso = new Date().toISOString();
 
       try {
         const { data: appointments, error: appointmentsError } = await supabase
