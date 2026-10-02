@@ -2,668 +2,1340 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#10111a">
-  <title>Beauty Flow — Gestão de agendamentos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#a78bfa">
+  <title>Beauty Flow — Gestão de beleza</title>
 
   <style>
     :root {
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color-scheme: dark;
       --bg: #10111a;
       --surface: #181a26;
-      --surface-2: #202332;
-      --border: #2c3040;
+      --surface2: #202332;
       --text: #f4f5fb;
       --muted: #9da3b7;
+      --border: #2c3040;
       --primary: #a78bfa;
-      --primary-hover: #9270f4;
+      --primary-ink: #191329;
       --green: #56d6a2;
       --red: #ff7485;
-      --radius: 16px;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --shadow: 0 18px 55px rgba(0,0,0,.16);
+    }
+
+    body[data-theme="light"] {
+      color-scheme: light;
+      --bg: #f5f5fa;
+      --surface: #fff;
+      --surface2: #f0eef7;
+      --text: #222333;
+      --muted: #777b8d;
+      --border: #e4e2ec;
+      --primary-ink: #21183a;
+      --green: #138b62;
+      --red: #c83c50;
+      --shadow: 0 18px 55px rgba(42,34,68,.07);
     }
 
     * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      min-height: 100vh;
-      color: var(--text);
-      background:
-        radial-gradient(ellipse at 10% 0%, rgba(124, 92, 235, .15), transparent 38%),
-        var(--bg);
-    }
-
-    button, input, select { font: inherit; }
+    body { margin: 0; min-height: 100vh; color: var(--text); background: var(--bg); }
+    button, input, select, textarea { font: inherit; }
     button { cursor: pointer; }
-
-    .shell {
-      display: grid;
-      grid-template-columns: 240px minmax(0, 1fr);
-      min-height: 100vh;
-    }
-
-    aside {
-      display: flex;
-      flex-direction: column;
-      gap: 28px;
-      padding: 26px 18px;
-      border-right: 1px solid var(--border);
-      background: rgba(16, 17, 26, .84);
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      padding: 0 8px;
-      font-size: 19px;
-      font-weight: 750;
-      letter-spacing: -.5px;
-    }
-
-    .brand-mark {
-      display: grid;
-      width: 36px;
-      height: 36px;
-      place-items: center;
-      border-radius: 12px;
-      color: #171324;
-      background: linear-gradient(135deg, #c4b5fd, #8b5cf6);
-    }
-
-    .nav-label {
-      margin: 0 10px 9px;
-      color: var(--muted);
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 11px;
-      width: 100%;
-      margin: 3px 0;
-      padding: 11px 12px;
-      border: 0;
-      border-radius: 11px;
-      color: var(--muted);
-      background: transparent;
-      text-align: left;
-    }
-
-    .nav-item.active, .nav-item:hover {
-      color: var(--text);
-      background: var(--surface-2);
-    }
-
-    .side-bottom {
-      margin-top: auto;
-      padding: 14px;
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.6;
-    }
-
-    main { min-width: 0; padding: 30px clamp(18px, 4vw, 54px); }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 30px;
-    }
-
-    .eyebrow { color: var(--muted); font-size: 13px; }
-    h1 { margin: 5px 0 0; font-size: clamp(25px, 4vw, 34px); letter-spacing: -1px; }
-    .top-actions { display: flex; align-items: center; gap: 10px; }
-
-    .button {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 42px;
-      padding: 0 15px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      color: var(--text);
-      background: var(--surface);
-      font-weight: 650;
-    }
-
-    .button:hover { background: var(--surface-2); }
-    .button.primary { border-color: transparent; color: #191329; background: var(--primary); }
-    .button.primary:hover { background: var(--primary-hover); }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
-      margin-bottom: 22px;
-    }
-
-    .stat, .panel {
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: rgba(24, 26, 38, .92);
-    }
-
-    .stat { padding: 19px; }
-    .stat-label { color: var(--muted); font-size: 13px; }
-    .stat-number { margin-top: 10px; font-size: 29px; font-weight: 750; letter-spacing: -.8px; }
-    .stat-hint { margin-top: 5px; color: var(--muted); font-size: 12px; }
-
-    .panel { overflow: hidden; }
-    .panel-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 14px;
-      padding: 19px 20px;
-      border-bottom: 1px solid var(--border);
-    }
-
-    .panel-head h2 { margin: 0; font-size: 16px; }
-    .panel-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
-    .table-wrap { overflow-x: auto; }
-
-    table { width: 100%; border-collapse: collapse; text-align: left; }
-    th, td { padding: 15px 20px; border-bottom: 1px solid rgba(44, 48, 64, .72); white-space: nowrap; }
-    th { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; }
-    td { font-size: 13px; }
-    tbody tr:last-child td { border-bottom: 0; }
-
-    .client-name { font-weight: 650; }
-    .subtext { margin-top: 4px; color: var(--muted); font-size: 12px; }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 9px;
-      border-radius: 999px;
-      color: var(--green);
-      background: rgba(86, 214, 162, .1);
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .empty { padding: 45px 20px; color: var(--muted); text-align: center; }
-    .empty strong { display: block; margin-bottom: 6px; color: var(--text); }
-
-    .notice {
-      display: none;
-      margin-bottom: 16px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 11px;
-      color: var(--muted);
-      background: var(--surface);
-      font-size: 13px;
-    }
-
-    .notice.error { display: block; color: #ff9ca8; border-color: rgba(255,116,133,.35); }
-    .notice.success { display: block; color: var(--green); border-color: rgba(86,214,162,.35); }
-
-    .login-screen {
-      display: grid;
-      min-height: 100vh;
-      place-items: center;
-      padding: 20px;
-    }
-
-    .login-card {
-      width: min(100%, 420px);
-      padding: 28px;
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      background: var(--surface);
-      box-shadow: 0 24px 80px rgba(0,0,0,.28);
-    }
-
-    .login-card h1 { margin-bottom: 9px; font-size: 25px; }
-    .login-card > p { margin: 0 0 22px; color: var(--muted); font-size: 14px; line-height: 1.6; }
-    .field { display: grid; gap: 7px; margin: 14px 0; }
-    .field label { color: var(--muted); font-size: 12px; font-weight: 650; }
-
-    .field input {
-      width: 100%;
-      min-height: 43px;
-      padding: 10px 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      outline: none;
-      color: var(--text);
-      background: #131520;
-    }
-
-    .field input:focus { border-color: var(--primary); }
-    .full { width: 100%; margin-top: 8px; }
-    .switch-auth { display: block; margin: 17px auto 0; border: 0; color: var(--primary); background: transparent; }
     .hidden { display: none !important; }
 
-    dialog {
-      width: min(100% - 28px, 480px);
-      padding: 0;
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      color: var(--text);
-      background: var(--surface);
+    .app { display: grid; grid-template-columns: 248px minmax(0,1fr); min-height: 100vh; }
+    .sidebar {
+      position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column;
+      padding: 20px 15px; border-right: 1px solid var(--border);
+      background: var(--surface); z-index: 20;
     }
-
-    dialog::backdrop { background: rgba(5, 6, 12, .72); backdrop-filter: blur(4px); }
-    .dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 20px 22px; border-bottom: 1px solid var(--border); }
-    .dialog-head h2 { margin: 0; font-size: 17px; }
-    .dialog-body { padding: 8px 22px 22px; }
-    .close { border: 0; color: var(--muted); background: transparent; font-size: 23px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .footer-note { margin-top: 15px; color: var(--muted); font-size: 11px; line-height: 1.5; }
-
-    @media (max-width: 760px) {
-      .shell { display: block; }
-      aside { display: none; }
-      main { padding: 22px 15px; }
-      .stats { grid-template-columns: 1fr; gap: 10px; }
-      .stat { padding: 15px; }
-      .stat-number { font-size: 25px; }
-      .topbar { align-items: flex-start; }
-      .top-actions .button:not(.primary) { display: none; }
-      th, td { padding: 13px 14px; }
-      .panel-head { padding: 16px; }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 4px 9px 22px; font-size: 19px; font-weight: 800; }
+    .brand-mark {
+      display: grid; width: 38px; height: 38px; place-items: center;
+      border-radius: 13px; color: var(--primary-ink); background: var(--primary); font-size: 19px;
     }
+    .nav-title { padding: 0 10px; margin: 10px 0 8px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+    .nav-item {
+      width: 100%; display: flex; align-items: center; gap: 10px; margin: 3px 0;
+      padding: 11px 12px; border: 0; border-radius: 11px;
+      color: var(--muted); background: transparent; text-align: left;
+    }
+    .nav-item:hover, .nav-item.active { color: var(--text); background: var(--surface2); }
+    .nav-icon { width: 20px; text-align: center; }
+    .nav-count {
+      margin-left: auto; padding: 2px 7px; border-radius: 99px;
+      color: var(--primary-ink); background: var(--primary); font-size: 11px; font-weight: 800;
+    }
+    .side-foot { margin-top: auto; padding: 13px; border: 1px solid var(--border); border-radius: 13px; color: var(--muted); font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
 
+    .main { min-width: 0; }
+    .topbar {
+      position: sticky; top: 0; z-index: 10; display: flex; align-items: center;
+      justify-content: space-between; gap: 12px; padding: 15px clamp(14px,3vw,36px);
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in srgb, var(--bg) 91%, transparent); backdrop-filter: blur(12px);
+    }
+    .top-left, .top-actions { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .unit-label { color: var(--muted); font-size: 11px; }
+    .unit-name { font-weight: 750; }
+    .content { max-width: 1500px; margin: auto; padding: 26px clamp(14px,3vw,36px) 48px; }
+    .page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; margin-bottom: 20px; }
+    .page-head h1 { margin: 0; font-size: clamp(25px,3vw,34px); letter-spacing: -.8px; }
+    .page-head p { margin: 6px 0 0; color: var(--muted); font-size: 13px; }
+
+    .button {
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+      min-height: 39px; padding: 0 12px; border: 1px solid var(--border);
+      border-radius: 10px; color: var(--text); background: var(--surface);
+      font-weight: 700; white-space: nowrap;
+    }
+    .button:hover { background: var(--surface2); }
+    .button.primary { border-color: transparent; color: var(--primary-ink); background: var(--primary); }
+    .button.danger { color: var(--red); }
+    .button.small { min-height: 31px; padding: 0 9px; font-size: 12px; }
+    .icon-button { width: 39px; padding: 0; font-size: 17px; }
+    .hamburger { display: none !important; }
+
+    .metric-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 13px; margin-bottom: 17px; }
+    .metric, .panel { border: 1px solid var(--border); border-radius: 15px; background: var(--surface); box-shadow: var(--shadow); }
+    .metric { padding: 17px; }
+    .metric-label { color: var(--muted); font-size: 12px; }
+    .metric-value { margin-top: 9px; font-size: clamp(22px,3vw,30px); font-weight: 800; letter-spacing: -.6px; }
+    .metric-note { margin-top: 5px; color: var(--muted); font-size: 11px; }
+    .panel { overflow: hidden; margin-bottom: 16px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    .panel-head h2 { margin: 0; font-size: 15px; }
+    .panel-head p { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .panel-body { padding: 18px; }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 12px 15px; border-bottom: 1px solid var(--border); vertical-align: middle; white-space: nowrap; font-size: 13px; }
+    th { color: var(--muted); font-size: 10px; letter-spacing: .7px; text-transform: uppercase; }
+    tbody tr:last-child td { border-bottom: 0; }
+    .badge { display: inline-flex; padding: 5px 9px; border-radius: 99px; color: var(--green); background: color-mix(in srgb, var(--green) 12%, transparent); font-size: 11px; font-weight: 750; }
+    .badge.cancelled { color: var(--red); background: color-mix(in srgb, var(--red) 12%, transparent); }
+    .empty { padding: 30px 15px; color: var(--muted); text-align: center; white-space: normal; }
+    .notice { display: none; margin: 0 0 14px; padding: 11px 13px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); font-size: 13px; }
+    .notice.show { display: block; }
+    .notice.error { color: var(--red); }
+    .notice.success { color: var(--green); }
+
+    .form-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 13px; }
+    .field { display: grid; gap: 7px; margin: 10px 0; }
+    .field.full { grid-column: 1/-1; }
+    .field label { color: var(--muted); font-size: 12px; font-weight: 700; }
+    .field input, .field select, .field textarea {
+      width: 100%; min-height: 41px; padding: 9px 11px; border: 1px solid var(--border);
+      border-radius: 9px; outline: none; color: var(--text); background: var(--bg);
+    }
+    .field textarea { min-height: 86px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); }
+    .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--border); }
+    .setting-row:last-child { border-bottom: 0; }
+    .setting-row strong { display: block; font-size: 13px; }
+    .setting-row small { display: block; margin-top: 4px; color: var(--muted); }
+    input[type="color"] { width: 48px !important; min-height: 38px !important; padding: 3px !important; }
+
+    .login-screen { display: grid; min-height: 100vh; place-items: center; padding: 20px; }
+    .login-card { width: min(100%,410px); padding: 26px; border: 1px solid var(--border); border-radius: 19px; background: var(--surface); box-shadow: var(--shadow); }
+    .login-card h1 { margin: 8px 0; font-size: 25px; }
+    .login-card p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .switch-auth { display: block; margin: 15px auto 0; border: 0; color: var(--primary); background: transparent; }
+
+    dialog { width: min(100% - 26px,600px); max-height: 90vh; padding: 0; border: 1px solid var(--border); border-radius: 16px; color: var(--text); background: var(--surface); }
+    dialog::backdrop { background: rgba(5,6,12,.65); backdrop-filter: blur(3px); }
+    .dialog-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 19px; border-bottom: 1px solid var(--border); }
+    .dialog-head h2 { margin: 0; font-size: 16px; }
+    .dialog-content { padding: 9px 19px 18px; }
+    .close { border: 0; color: var(--muted); background: transparent; font-size: 22px; }
+    .backdrop { display: none; }
+
+    @media (max-width: 950px) {
+      .app { grid-template-columns: 220px minmax(0,1fr); }
+      .metric-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 700px) {
+      .app { display: block; }
+      .sidebar { position: fixed; left: 0; top: 0; width: 270px; transform: translateX(-105%); transition: transform .2s ease; box-shadow: var(--shadow); }
+      .sidebar.open { transform: translateX(0); }
+      .backdrop.show { display: block; position: fixed; inset: 0; z-index: 15; background: rgba(0,0,0,.45); }
+      .hamburger { display: inline-flex !important; }
+      .topbar { padding: 11px 12px; }
+      .content { padding: 19px 12px 34px; }
+      .unit-label { display: none; }
+      .top-actions { gap: 5px; }
+      .top-actions .button { padding: 0 9px; }
+      .page-head { align-items: flex-start; flex-direction: column; }
+      .form-grid { grid-template-columns: 1fr; }
+      .field.full { grid-column: auto; }
+      th, td { padding: 11px; }
+    }
     @media (max-width: 430px) {
-      .topbar { flex-direction: column; }
-      .top-actions { width: 100%; }
-      .top-actions .button { flex: 1; }
-      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .metric-grid { gap: 8px; }
+      .metric { padding: 13px; }
+      .metric-value { font-size: 22px; }
+      #copyLinkButton { font-size: 0; }
+      #copyLinkButton::first-letter { font-size: 15px; }
     }
   </style>
 </head>
 
-<body>
-  <section id="loginScreen" class="login-screen">
-    <div class="login-card">
-      <div class="brand" style="padding:0;margin-bottom:22px">
-        <span class="brand-mark">✦</span>
-        <span>Beauty Flow</span>
+<body data-theme="dark">
+  <div id="loginScreen" class="login-screen">
+    <section class="login-card">
+      <div class="brand" style="padding:0">
+        <span class="brand-mark">✦</span><span id="loginBrand">Beauty Flow</span>
       </div>
       <h1 id="authTitle">Entre na sua conta</h1>
-      <p id="authDescription">Acesse sua agenda e organize seus atendimentos em um só lugar.</p>
+      <p id="authDescription">Organize agenda, clientes e equipe em um só lugar.</p>
       <div id="authNotice" class="notice"></div>
       <form id="authForm">
         <div class="field">
           <label for="email">E-mail</label>
-          <input id="email" type="email" autocomplete="email" required placeholder="voce@exemplo.com">
+          <input id="email" type="email" required autocomplete="email">
         </div>
         <div class="field">
           <label for="password">Senha</label>
-          <input id="password" type="password" autocomplete="current-password" required minlength="6" placeholder="Mínimo de 6 caracteres">
+          <input id="password" type="password" required minlength="6" autocomplete="current-password">
         </div>
-        <button class="button primary full" id="authSubmit" type="submit">Entrar</button>
+        <button class="button primary" id="authSubmit" style="width:100%;margin-top:8px" type="submit">Entrar</button>
       </form>
       <button class="switch-auth" id="switchAuth" type="button">Criar uma conta</button>
-    </div>
-  </section>
+    </section>
+  </div>
 
-  <div id="app" class="shell hidden">
-    <aside>
-      <div class="brand"><span class="brand-mark">✦</span><span>Beauty Flow</span></div>
-      <div>
-        <p class="nav-label">Menu principal</p>
-        <button class="nav-item active" type="button">▦ <span>Visão geral</span></button>
-        <button class="nav-item" type="button" id="sideNewBooking">＋ <span>Agendamentos</span></button>
-        <button class="nav-item" type="button" id="sideClients">♙ <span>Clientes</span></button>
-      </div>
-      <div class="side-bottom">
-        <strong style="color:var(--text)">Seu espaço de trabalho</strong><br>
-        MVP conectado ao Supabase. Configure as políticas de segurança antes de usar com clientes reais.
-      </div>
+  <div id="app" class="app hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="brand"><span class="brand-mark">✦</span><span id="brandName">Beauty Flow</span></div>
+      <div class="nav-title">Workspace</div>
+      <nav>
+        <button class="nav-item active" data-page="dashboard"><span class="nav-icon">▦</span>Painel geral</button>
+        <button class="nav-item" data-page="appointments"><span class="nav-icon">▣</span>Agenda <span id="agendaCount" class="nav-count">0</span></button>
+        <button class="nav-item" data-page="calendar"><span class="nav-icon">↻</span>Google Agenda</button>
+        <button class="nav-item" data-page="clients"><span class="nav-icon">♙</span>Clientes & CRM</button>
+        <button class="nav-item" data-page="anamneses"><span class="nav-icon">▤</span>Fichas de anamnese</button>
+        <button class="nav-item" data-page="team"><span class="nav-icon">♧</span>Equipe & comissões</button>
+        <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Personalização</button>
+      </nav>
+      <div class="side-foot"><strong id="sideSalonName" style="color:var(--text)">Beauty Flow</strong><br><span id="sideUnitName">Minha unidade</span></div>
     </aside>
 
-    <main>
+    <div id="backdrop" class="backdrop"></div>
+
+    <section class="main">
       <header class="topbar">
-        <div>
-          <div class="eyebrow">Painel de controle</div>
-          <h1>Visão geral</h1>
+        <div class="top-left">
+          <button id="menuButton" class="button icon-button hamburger" aria-label="Abrir menu" type="button">☰</button>
+          <div><div class="unit-label">Unidade atual</div><div class="unit-name" id="topUnitName">Minha unidade</div></div>
         </div>
         <div class="top-actions">
-          <button class="button" id="logoutButton" type="button">Sair</button>
-          <button class="button primary" id="newBookingButton" type="button">＋ Novo agendamento</button>
+          <button id="copyLinkButton" class="button" title="Copiar link público" type="button">🔗 Link</button>
+          <button id="themeButton" class="button icon-button" title="Alternar tema" aria-label="Alternar tema" type="button">☼</button>
+          <button id="logoutButton" class="button" type="button">Sair</button>
+          <button id="quickBookButton" class="button primary" type="button">＋ Agendar</button>
         </div>
       </header>
 
-      <div id="appNotice" class="notice"></div>
-
-      <section class="stats" aria-label="Resumo dos agendamentos">
-        <article class="stat">
-          <div class="stat-label">Agendamentos de hoje</div>
-          <div class="stat-number" id="todayCount">—</div>
-          <div class="stat-hint">Atendimentos marcados para hoje</div>
-        </article>
-        <article class="stat">
-          <div class="stat-label">Próximos agendamentos</div>
-          <div class="stat-number" id="upcomingCount">—</div>
-          <div class="stat-hint">A partir de agora</div>
-        </article>
-        <article class="stat">
-          <div class="stat-label">Clientes cadastrados</div>
-          <div class="stat-number" id="clientsCount">—</div>
-          <div class="stat-hint">Na sua conta</div>
-        </article>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <div>
-            <h2>Próximos agendamentos</h2>
-            <p>Seus atendimentos futuros</p>
-          </div>
-          <button class="button" id="refreshButton" type="button">Atualizar</button>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Cliente</th>
-                <th>Serviço</th>
-                <th>Data e hora</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="bookingsTable"></tbody>
-          </table>
-          <div id="emptyState" class="empty hidden">
-            <strong>Nenhum agendamento por enquanto</strong>
-            Crie seu primeiro agendamento usando o botão acima.
-          </div>
-        </div>
-      </section>
-    </main>
+      <main class="content">
+        <div id="appNotice" class="notice"></div>
+        <div id="pageContent"></div>
+      </main>
+    </section>
   </div>
 
-  <dialog id="bookingDialog">
+  <dialog id="formDialog">
     <div class="dialog-head">
-      <h2>Novo agendamento</h2>
+      <h2 id="dialogTitle">Cadastro</h2>
       <button class="close" id="closeDialog" type="button" aria-label="Fechar">×</button>
     </div>
-    <form id="bookingForm" class="dialog-body">
-      <div class="field">
-        <label for="clientName">Nome do cliente</label>
-        <input id="clientName" required maxlength="120" placeholder="Ex.: Ana Souza">
-      </div>
-      <div class="field">
-        <label for="clientPhone">Telefone (opcional)</label>
-        <input id="clientPhone" type="tel" maxlength="30" placeholder="Ex.: (11) 99999-9999">
-      </div>
-      <div class="field">
-        <label for="serviceName">Serviço</label>
-        <input id="serviceName" required maxlength="120" placeholder="Ex.: Corte">
-      </div>
-      <div class="form-row">
-        <div class="field">
-          <label for="bookingDate">Data</label>
-          <input id="bookingDate" type="date" required>
-        </div>
-        <div class="field">
-          <label for="bookingTime">Horário</label>
-          <input id="bookingTime" type="time" required>
-        </div>
-      </div>
-      <button class="button primary full" type="submit">Salvar agendamento</button>
-      <div class="footer-note">Este MVP salva os dados na sua conta autenticada do Supabase.</div>
-    </form>
+    <div class="dialog-content" id="dialogContent"></div>
   </dialog>
 
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    // Substitua pelos dados do seu projeto em Supabase > Project Settings > API.
     const SUPABASE_URL = "https://zeadijzeqbnlelcongwu.supabase.co";
     const SUPABASE_ANON_KEY = "sb_publishable_y9P1yvnZkvnI09lU0o00TQ_51SkWhjY";
 
-    const isConfigured =
-  SUPABASE_URL !== "https://SEU-PROJETO.supabase.co" &&
-  SUPABASE_ANON_KEY !== "SUA_CHAVE_PUBLICA_ANON";
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const $ = id => document.getElementById(id);
 
-    const supabase = isConfigured
-      ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      : null;
+    let user = null;
+    let page = "dashboard";
+    let settings = {
+      salon_name: "Beauty Flow",
+      unit_name: "Minha unidade",
+      primary_color: "#a78bfa",
+      theme: "dark",
+      calendar_mode: "internal",
+      google_email: ""
+    };
+    let clients = [];
+    let professionals = [];
+    let appointments = [];
+    let anamneses = [];
+    let authSignup = false;
 
-    const $ = (id) => document.getElementById(id);
-    let isSignUp = false;
-    let currentUser = null;
-
-    function showNotice(element, message, type = "error") {
-      element.textContent = message;
-      element.className = `notice ${type}`;
+    const services = [
+      { name: "Corte e Escova", price: 120 },
+      { name: "Manicure", price: 55 },
+      { name: "Coloração", price: 260 },
+      { name: "Sobrancelha", price: 45 }
+    ];<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>function esc(value) {
+      return String(value ?? "").replace(/[&<>"']/g, ch => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[ch]);
     }
 
-    function clearNotice(element) {
-      element.textContent = "";
-      element.className = "notice";
+    function showNotice(message, type = "success", target = "appNotice") {
+      const box = $(target);
+      box.textContent = message;
+      box.className = `notice show ${type}`;
+      clearTimeout(box.timer);
+      box.timer = setTimeout(() => { box.className = "notice"; }, 5000);
     }
 
-    function formatDate(dateString, timeString) {
-      const date = new Date(`${dateString}T${timeString || "00:00"}:00`);
+    function money(value) {
+      return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      }).format(Number(value || 0));
+    }
+
+    function dateTime(date, time) {
+      if (!date) return "—";
+      const value = new Date(`${date}T${time || "00:00"}:00`);
       return new Intl.DateTimeFormat("pt-BR", {
-        day: "2-digit", month: "short", year: "numeric",
-        hour: "2-digit", minute: "2-digit"
-      }).format(date);
+        dateStyle: "medium",
+        timeStyle: "short"
+      }).format(value);
     }
 
-    function setLoggedIn(user) {
-      currentUser = user;
-      $("loginScreen").classList.add("hidden");
-      $("app").classList.remove("hidden");
-      loadDashboard();
+    function applyTheme() {
+      document.body.dataset.theme = settings.theme || "dark";
+      document.documentElement.style.setProperty(
+        "--primary",
+        settings.primary_color || "#a78bfa"
+      );
+      $("themeButton").textContent = settings.theme === "dark" ? "☼" : "☾";
     }
 
-    function setLoggedOut() {
-      currentUser = null;
-      $("app").classList.add("hidden");
-      $("loginScreen").classList.remove("hidden");
+    function updateBrand() {
+      const salon = settings.salon_name || "Beauty Flow";
+      const unit = settings.unit_name || "Minha unidade";
+
+      $("brandName").textContent = salon;
+      $("loginBrand").textContent = salon;
+      $("sideSalonName").textContent = salon;
+      $("sideUnitName").textContent = unit;
+      $("topUnitName").textContent = unit;
+
+      applyTheme();
     }
 
-    function updateAuthForm() {
-      $("authTitle").textContent = isSignUp ? "Crie sua conta" : "Entre na sua conta";
-      $("authDescription").textContent = isSignUp
-        ? "Cadastre-se para começar a organizar seus atendimentos."
-        : "Acesse sua agenda e organize seus atendimentos em um só lugar.";
-      $("authSubmit").textContent = isSignUp ? "Criar conta" : "Entrar";
-      $("switchAuth").textContent = isSignUp
-        ? "Já tem uma conta? Entrar"
-        : "Criar uma conta";
-      $("password").autocomplete = isSignUp ? "new-password" : "current-password";
+    async function loadAll() {
+      const results = await Promise.all([
+        supabase.from("business_settings")
+          .select("*")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+
+        supabase.from("clients")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("name"),
+
+        supabase.from("professionals")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("name"),
+
+        supabase.from("appointments")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("appointment_date")
+          .order("appointment_time"),
+
+        supabase.from("anamneses")
+          .select("*")
+          .eq("user_id", user.id)
+          .order("created_at", { ascending: false })
+      ]);
+
+      for (const result of results) {
+        if (result.error) throw result.error;
+      }
+
+      if (results[0].data) {
+        settings = { ...settings, ...results[0].data };
+      }
+
+      clients = results[1].data || [];
+      professionals = results[2].data || [];
+      appointments = results[3].data || [];
+      anamneses = results[4].data || [];
+
+      updateBrand();
+
+      $("agendaCount").textContent =
+        appointments.filter(item => item.status !== "cancelled").length;
+
+      renderPage();
     }
 
-    $("switchAuth").addEventListener("click", () => {
-      isSignUp = !isSignUp;
-      clearNotice($("authNotice"));
-      updateAuthForm();
-    });
+    async function saveSettings() {
+      const { error } = await supabase
+        .from("business_settings")
+        .upsert({
+          user_id: user.id,
+          ...settings,
+          updated_at: new Date().toISOString()
+        });
 
-    $("authForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      clearNotice($("authNotice"));
+      if (error) throw error;
+      updateBrand();
+    }
 
-      if (!supabase) {
-        showNotice($("authNotice"), "Configure SUPABASE_URL e SUPABASE_ANON_KEY no código antes de entrar.");
+    function pageHeader(title, subtitle, action = "") {
+      return `
+        <div class="page-head">
+          <div>
+            <h1>${title}</h1>
+            <p>${subtitle}</p>
+          </div>
+          ${action}
+        </div>`;
+    }
+
+    function emptyRow(message, columns) {
+      return `
+        <tr>
+          <td colspan="${columns}" class="empty">${esc(message)}</td>
+        </tr>`;
+    }
+
+    function appointmentRows(rows) {
+      if (!rows.length) {
+        return emptyRow("Nenhum agendamento encontrado.", 8);
+      }
+
+      return rows.map(item => {
+        const client = clients.find(entry => entry.id === item.client_id);
+        const professional = professionals.find(entry => entry.id === item.professional_id);
+        const cancelled = item.status === "cancelled";
+
+        return `
+          <tr>
+            <td><strong>${esc(item.client_name || client?.name || "Cliente")}</strong></td>
+            <td>${esc(item.service_name)}</td>
+            <td>${dateTime(item.appointment_date, item.appointment_time)}</td>
+            <td>${esc(professional?.name || "—")}</td>
+            <td>${money(item.price)}</td>
+            <td>${money(item.commission_amount)}</td>
+            <td>
+              <span class="badge ${cancelled ? "cancelled" : ""}">
+                ${cancelled ? "Cancelado" : "Agendado"}
+              </span>
+            </td>
+            <td>
+              ${cancelled ? "" : `
+                <button
+                  class="button danger small"
+                  data-cancel="${esc(item.id)}"
+                  type="button">
+                  Desmarcar
+                </button>`}
+            </td>
+          </tr>`;
+      }).join("");
+    }
+
+    function renderDashboard() {
+      const active = appointments.filter(item => item.status !== "cancelled");
+      const revenue = active.reduce(
+        (sum, item) => sum + Number(item.price || 0),
+        0
+      );
+      const commission = active.reduce(
+        (sum, item) => sum + Number(item.commission_amount || 0),
+        0
+      );
+      const today = new Date().toLocaleDateString("en-CA");
+
+      const recent = [...appointments]
+        .sort((a, b) =>
+          `${b.appointment_date}T${b.appointment_time}`
+            .localeCompare(`${a.appointment_date}T${a.appointment_time}`)
+        )
+        .slice(0, 8);
+
+      return `
+        ${pageHeader(
+          "Painel geral",
+          "Resumo da operação do seu espaço de beleza."
+        )}
+
+        <section class="metric-grid">
+          <article class="metric">
+            <div class="metric-label">Agendamentos realizados</div>
+            <div class="metric-value">${active.length}</div>
+            <div class="metric-note">
+              ${active.filter(item => item.appointment_date === today).length} hoje
+            </div>
+          </article>
+
+          <article class="metric">
+            <div class="metric-label">Faturamento bruto</div>
+            <div class="metric-value">${money(revenue)}</div>
+            <div class="metric-note">Soma dos agendamentos ativos</div>
+          </article>
+
+          <article class="metric">
+            <div class="metric-label">Comissões calculadas</div>
+            <div class="metric-value">${money(commission)}</div>
+            <div class="metric-note">Comissões dos agendamentos</div>
+          </article>
+
+          <article class="metric">
+            <div class="metric-label">Clientes ativos</div>
+            <div class="metric-value">
+              ${clients.filter(client => client.active).length}
+            </div>
+            <div class="metric-note">Clientes cadastrados</div>
+          </article>
+        </section>
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Atendimentos recentes</h2>
+              <p>Registros mais recentes da agenda</p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Serviço</th>
+                  <th>Data e hora</th>
+                  <th>Profissional</th>
+                  <th>Preço</th>
+                  <th>Comissão</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>${appointmentRows(recent)}</tbody>
+            </table>
+          </div>
+        </section>`;
+    }
+
+    function renderAppointments() {
+      const sorted = [...appointments].sort((a, b) =>
+        `${a.appointment_date}T${a.appointment_time}`
+          .localeCompare(`${b.appointment_date}T${b.appointment_time}`)
+      );
+
+      return `
+        ${pageHeader(
+          "Gestão da agenda",
+          "Consulte e administre os horários.",
+          `<button class="button primary" data-open="appointment" type="button">
+            ＋ Novo agendamento
+          </button>`
+        )}
+
+        <section class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Serviço</th>
+                  <th>Data e hora</th>
+                  <th>Profissional</th>
+                  <th>Preço</th>
+                  <th>Comissão</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>${appointmentRows(sorted)}</tbody>
+            </table>
+          </div>
+        </section>`;
+    }
+
+    function renderClients() {
+      const rows = clients.map(client => `
+        <tr>
+          <td><strong>${esc(client.name)}</strong></td>
+          <td>${esc(client.phone || "—")}</td>
+          <td>${esc(client.email || "—")}</td>
+          <td>
+            <span class="badge ${client.active ? "" : "cancelled"}">
+              ${client.active ? "Ativo" : "Inativo"}
+            </span>
+          </td>
+        </tr>
+      `).join("") || emptyRow(
+        "Nenhum cliente cadastrado. Adicione seu primeiro cliente.",
+        4
+      );
+
+      return `
+        ${pageHeader(
+          "Clientes & CRM",
+          "Cadastro unificado de clientes.",
+          `<button class="button primary" data-open="client" type="button">
+            ＋ Cadastrar cliente
+          </button>`
+        )}
+
+        <section class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>WhatsApp / telefone</th>
+                  <th>E-mail</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </section>`;
+    }
+
+    function renderTeam() {
+      const rows = professionals.map(professional => `
+        <tr>
+          <td><strong>${esc(professional.name)}</strong></td>
+          <td>${esc(professional.specialty || "—")}</td>
+          <td>${Number(professional.commission_percent || 0)}%</td>
+          <td>
+            <span class="badge ${professional.active ? "" : "cancelled"}">
+              ${professional.active ? "Ativo" : "Inativo"}
+            </span>
+          </td>
+        </tr>
+      `).join("") || emptyRow(
+        "Nenhum profissional cadastrado. Cadastre alguém da equipe para agendar.",
+        4
+      );
+
+      return `
+        ${pageHeader(
+          "Equipe & comissões",
+          "Profissionais e percentuais de comissão.",
+          `<button class="button primary" data-open="professional" type="button">
+            ＋ Cadastrar profissional
+          </button>`
+        )}
+
+        <section class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Profissional</th>
+                  <th>Especialidade / cargo</th>
+                  <th>Comissão</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </section>`;
+    }
+
+    function renderAnamneses() {
+      const rows = anamneses.map(form => {
+        const client = clients.find(entry => entry.id === form.client_id);
+        const created = form.created_at
+          ? new Date(form.created_at).toLocaleString("pt-BR")
+          : "—";
+
+        return `
+          <tr>
+            <td><strong>${esc(client?.name || "Cliente")}</strong></td>
+            <td>${esc(created)}</td>
+            <td>${esc(form.allergies || "Não informado")}</td>
+            <td>${esc(form.chemical_history || "Não informado")}</td>
+            <td>${form.consent_accepted ? "Aceito" : "Não aceito"}</td>
+          </tr>`;
+      }).join("") || emptyRow(
+        "Nenhuma ficha cadastrada. Cadastre um cliente antes de preencher a anamnese.",
+        5
+      );
+
+      return `
+        ${pageHeader(
+          "Fichas de anamnese",
+          "Registros de segurança e consentimento.",
+          `<button class="button primary" data-open="anamnese" type="button">
+            ＋ Nova ficha
+          </button>`
+        )}
+
+        <section class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Preenchimento</th>
+                  <th>Alergias / restrições</th>
+                  <th>Histórico químico</th>
+                  <th>Consentimento</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        </section>`;
+    }
+
+    function renderCalendar() {
+      const isGoogle = settings.calendar_mode === "google";
+
+      return `
+        ${pageHeader(
+          "Google Agenda",
+          "Escolha como organizar seus horários."
+        )}
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Modo de agenda</h2>
+              <p>O modo Google requer configuração adicional de OAuth e Calendar API.</p>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="field">
+              <label for="calendarMode">Modo</label>
+              <select id="calendarMode">
+                <option value="internal" ${!isGoogle ? "selected" : ""}>
+                  Agenda interna do Beauty Flow
+                </option>
+                <option value="google" ${isGoogle ? "selected" : ""}>
+                  Google Calendar (configuração pendente)
+                </option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="googleEmail">Conta Google do profissional</label>
+              <input
+                id="googleEmail"
+                type="email"
+                value="${esc(settings.google_email || "")}"
+                placeholder="nome@gmail.com">
+            </div>
+
+            <button class="button primary" id="saveCalendar" type="button">
+              Salvar configuração
+            </button>
+            <p style="color:var(--muted);font-size:12px">
+              O modo e o e-mail são salvos no Supabase, mas não sincronizam eventos com o Google.
+            </p>
+          </div>
+        </section>`;
+    }
+
+    function renderSettings() {
+      return `
+        ${pageHeader(
+          "Personalização",
+          "Configure a marca, unidade, cor e aparência."
+        )}
+
+        <section class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>Identidade da empresa</h2>
+              <p>Preferências salvas na sua conta.</p>
+            </div>
+          </div>
+
+          <div class="panel-body">
+            <div class="form-grid">
+              <div class="field">
+                <label for="salonName">Nome do salão</label>
+                <input id="salonName" maxlength="100" value="${esc(settings.salon_name)}">
+              </div>
+              <div class="field">
+                <label for="unitName">Nome da unidade</label>
+                <input id="unitName" maxlength="100" value="${esc(settings.unit_name)}">
+              </div>
+            </div>
+
+            <div class="setting-row">
+              <div>
+                <strong>Cor principal</strong>
+                <small>Atualiza os detalhes do sistema.</small>
+              </div>
+              <input
+                id="primaryColor"
+                type="color"
+                value="${esc(settings.primary_color || "#a78bfa")}">
+            </div>
+
+            <div class="setting-row">
+              <div>
+                <strong>Tema</strong>
+                <small>Escolha entre aparência clara ou escura.</small>
+              </div>
+              <select
+                id="themeSelect"
+                style="min-height:38px;padding:7px;border:1px solid var(--border);border-radius:8px;color:var(--text);background:var(--bg)">
+                <option value="dark" ${settings.theme === "dark" ? "selected" : ""}>Escuro</option>
+                <option value="light" ${settings.theme === "light" ? "selected" : ""}>Claro</option>
+              </select>
+            </div>
+
+            <div style="margin-top:17px">
+              <button class="button primary" id="saveSettings" type="button">
+                Salvar personalização
+              </button>
+            </div>
+          </div>
+        </section>`;
+    }
+
+    function renderPage() {
+      const renderers = {
+        dashboard: renderDashboard,
+        appointments: renderAppointments,
+        clients: renderClients,
+        team: renderTeam,
+        anamneses: renderAnamneses,
+        calendar: renderCalendar,
+        settings: renderSettings
+      };
+
+      $("pageContent").innerHTML = renderers[page]();
+
+      document.querySelectorAll(".nav-item").forEach(button => {
+        button.classList.toggle("active", button.dataset.page === page);
+      });
+    }</body></html><!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body>function openDialog(title, html) {
+      $("dialogTitle").textContent = title;
+      $("dialogContent").innerHTML = html;
+      $("formDialog").showModal();
+    }
+
+    function clientForm() {
+      openDialog("Cadastrar cliente", `
+        <form id="clientForm">
+          <div class="field">
+            <label>Nome completo *</label>
+            <input name="name" required maxlength="120">
+          </div>
+          <div class="field">
+            <label>WhatsApp / telefone</label>
+            <input name="phone" type="tel" maxlength="40">
+          </div>
+          <div class="field">
+            <label>E-mail (opcional)</label>
+            <input name="email" type="email" maxlength="160">
+          </div>
+          <button class="button primary" type="submit">Salvar cliente</button>
+        </form>
+      `);
+    }
+
+    function professionalForm() {
+      openDialog("Cadastrar profissional", `
+        <form id="professionalForm">
+          <div class="field">
+            <label>Nome completo *</label>
+            <input name="name" required maxlength="120">
+          </div>
+          <div class="field">
+            <label>Especialidade / cargo</label>
+            <input name="specialty" maxlength="120" placeholder="Ex.: manicure">
+          </div>
+          <div class="field">
+            <label>Comissão (%) *</label>
+            <input name="commission_percent" type="number" min="0" max="100" step="0.01" value="0" required>
+          </div>
+          <button class="button primary" type="submit">Salvar profissional</button>
+        </form>
+      `);
+    }
+
+    function appointmentForm() {
+      if (!clients.length) {
+        notice("Cadastre um cliente antes de criar um agendamento.", "error");
+        page = "clients";
+        renderPage();
+        closeSidebar();
         return;
       }
+
+      if (!professionals.length) {
+        notice("Cadastre um profissional antes de criar um agendamento.", "error");
+        page = "team";
+        renderPage();
+        closeSidebar();
+        return;
+      }
+
+      const clientOptions = clients
+        .filter(client => client.active)
+        .map(client => `<option value="${esc(client.id)}">${esc(client.name)}</option>`)
+        .join("");
+
+      const professionalOptions = professionals
+        .filter(professional => professional.active)
+        .map(professional => {
+          const percent = Number(professional.commission_percent || 0);
+          return `<option value="${esc(professional.id)}">${esc(professional.name)} — comissão ${percent}%</option>`;
+        })
+        .join("");
+
+      const serviceOptions = services.map((service, index) =>
+        `<option value="${index}">${esc(service.name)} — ${money(service.price)}</option>`
+      ).join("");
+
+      openDialog("Novo agendamento", `
+        <form id="appointmentForm">
+          <div class="field">
+            <label>Cliente *</label>
+            <select name="client_id" required>
+              <option value="">Selecione um cliente</option>
+              ${clientOptions}
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Serviço *</label>
+            <select name="service_index" required>
+              <option value="">Selecione um serviço</option>
+              ${serviceOptions}
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Profissional *</label>
+            <select name="professional_id" required>
+              <option value="">Selecione um profissional</option>
+              ${professionalOptions}
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Data e horário *</label>
+            <input name="appointment_datetime" type="datetime-local" required>
+          </div>
+
+          <button class="button primary" type="submit">Salvar agendamento</button>
+        </form>
+      `);
+    }
+
+    function anamneseForm() {
+      const activeClients = clients.filter(client => client.active);
+
+      if (!activeClients.length) {
+        notice("Cadastre um cliente antes de criar uma ficha de anamnese.", "error");
+        page = "clients";
+        renderPage();
+        closeSidebar();
+        return;
+      }
+
+      const clientOptions = activeClients
+        .map(client => `<option value="${esc(client.id)}">${esc(client.name)}</option>`)
+        .join("");
+
+      openDialog("Nova ficha de anamnese", `
+        <form id="anamneseForm">
+          <div class="field">
+            <label>Cliente *</label>
+            <select name="client_id" required>
+              <option value="">Selecione um cliente</option>
+              ${clientOptions}
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Alergias ou sensibilidades</label>
+            <textarea name="allergies" maxlength="3000"></textarea>
+          </div>
+
+          <div class="field">
+            <label>Histórico químico de procedimentos</label>
+            <textarea name="chemical_history" maxlength="5000"></textarea>
+          </div>
+
+          <div class="field">
+            <label style="display:flex;gap:9px;align-items:flex-start">
+              <input name="consent_accepted" type="checkbox" required>
+              <span>Confirmo que o cliente leu e aceitou o termo de consentimento.</span>
+            </label>
+          </div>
+
+          <button class="button primary" type="submit">Salvar ficha</button>
+        </form>
+      `);
+    }
+
+    function closeSidebar() {
+      $("sidebar").classList.remove("open");
+      $("backdrop").classList.remove("show");
+    }
+
+    async function saveClient(form) {
+      const data = new FormData(form);
+      const { error } = await supabase.from("clients").insert({
+        user_id: user.id,
+        name: String(data.get("name") || "").trim(),
+        phone: String(data.get("phone") || "").trim() || null,
+        email: String(data.get("email") || "").trim() || null,
+        active: true
+      });
+
+      if (error) throw error;
+
+      $("formDialog").close();
+      await loadAll();
+      notice("Cliente cadastrado.");
+    }
+
+    async function saveProfessional(form) {
+      const data = new FormData(form);
+      const percentage = Number(data.get("commission_percent"));
+
+      if (!Number.isFinite(percentage) || percentage < 0 || percentage > 100) {
+        throw new Error("A comissão deve estar entre 0% e 100%.");
+      }
+
+      const { error } = await supabase.from("professionals").insert({
+        user_id: user.id,
+        name: String(data.get("name") || "").trim(),
+        specialty: String(data.get("specialty") || "").trim() || null,
+        commission_percent: percentage,
+        active: true
+      });
+
+      if (error) throw error;
+
+      $("formDialog").close();
+      await loadAll();
+      notice("Profissional cadastrado.");
+    }
+
+    async function saveAppointment(form) {
+      const data = new FormData(form);
+      const client = clients.find(item => item.id === data.get("client_id"));
+      const professional = professionals.find(item => item.id === data.get("professional_id"));
+      const service = services[Number(data.get("service_index"))];
+      const dateValue = String(data.get("appointment_datetime") || "");
+
+      if (!client || !professional || !service || !dateValue.includes("T")) {
+        throw new Error("Confira os dados do agendamento e tente novamente.");
+      }
+
+      const [appointment_date, appointment_time] = dateValue.split("T");
+      const commissionAmount =
+        Math.round(service.price * Number(professional.commission_percent || 0)) / 100;
+
+      const { error } = await supabase.from("appointments").insert({
+        user_id: user.id,
+        client_id: client.id,
+        professional_id: professional.id,
+        client_name: client.name,
+        service_name: service.name,
+        appointment_date,
+        appointment_time,
+        price: service.price,
+        commission_amount: commissionAmount,
+        status: "scheduled"
+      });
+
+      if (error) throw error;
+
+      $("formDialog").close();
+      await loadAll();
+      notice("Agendamento salvo.");
+    }
+
+    async function saveAnamnese(form) {
+      const data = new FormData(form);
+
+      const { error } = await supabase.from("anamneses").insert({
+        user_id: user.id,
+        client_id: String(data.get("client_id")),
+        allergies: String(data.get("allergies") || "").trim() || null,
+        chemical_history: String(data.get("chemical_history") || "").trim() || null,
+        consent_accepted: data.get("consent_accepted") === "on"
+      });
+
+      if (error) throw error;
+
+      $("formDialog").close();
+      await loadAll();
+      notice("Ficha de anamnese salva.");
+    }
+
+    async function cancelAppointment(id) {
+      if (!window.confirm("Quer mesmo desmarcar este agendamento?")) return;
+
+      const { error } = await supabase
+        .from("appointments")
+        .update({ status: "cancelled" })
+        .eq("id", id)
+        .eq("user_id", user.id);
+
+      if (error) throw error;
+
+      await loadAll();
+      notice("Agendamento desmarcado.");
+    }</body></html><!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:system-ui;padding:24px;background:#fff;color:#111}async function saveCalendarSettings() {
+      settings.calendar_mode = $("calendarMode").value;
+      settings.google_email = $("googleEmail").value.trim() || null;
+
+      await saveSettings();
+      notice(
+        settings.calendar_mode === "google"
+          ? "Preferências salvas. A sincronização com Google ainda precisa de configuração OAuth."
+          : "Preferências da agenda salvas."
+      );
+    }
+
+    async function saveBusinessSettings() {
+      settings.salon_name = $("salonName").value.trim() || "Beauty Flow";
+      settings.unit_name = $("unitName").value.trim() || "Minha unidade";
+      settings.primary_color = $("primaryColor").value || "#a78bfa";
+      settings.theme = $("themeSelect").value || "dark";
+
+      await saveSettings();
+      renderPage();
+      notice("Personalização salva.");
+    }
+
+    async function toggleTheme() {
+      settings.theme = settings.theme === "dark" ? "light" : "dark";
+      applyTheme();
+
+      try {
+        await saveSettings();
+        if (page === "settings") renderPage();
+      } catch (error) {
+        console.error(error);
+        showNotice("O tema mudou, mas não foi possível salvá-lo no Supabase.", "error");
+      }
+    }
+
+    async function copyBookingLink() {
+      const name = encodeURIComponent(settings.salon_name || "Beauty Flow");
+      const link = `${location.origin}${location.pathname}?salon=${name}`;
+
+      try {
+        await navigator.clipboard.writeText(link);
+        notice("Link copiado. O agendamento público precisa de uma página pública configurada.");
+      } catch {
+        window.prompt("Copie o link:", link);
+      }
+    }
+
+    async function startApp(currentUser) {
+      user = currentUser;
+      $("loginScreen").classList.add("hidden");
+      $("app").classList.remove("hidden");
+
+      try {
+        await loadAll();
+      } catch (error) {
+        console.error(error);
+        showNotice(
+          `Erro ao carregar dados do Supabase: ${error.message || "verifique as tabelas e políticas RLS."}`,
+          "error"
+        );
+      }
+    }
+
+    $("authForm").addEventListener("submit", async event => {
+      event.preventDefault();
 
       const email = $("email").value.trim();
       const password = $("password").value;
-      $("authSubmit").disabled = true;
-      $("authSubmit").textContent = "Aguarde...";
+      const submit = $("authSubmit");
+      submit.disabled = true;
+      submit.textContent = authSignup ? "Criando conta..." : "Entrando...";
 
       try {
-        const result = isSignUp
-          ? await supabase.auth.signUp({ email, password })
-          : await supabase.auth.signInWithPassword({ email, password });
+        if (authSignup) {
+          const { data, error } = await supabase.auth.signUp({ email, password });
+          if (error) throw error;
 
-        if (result.error) throw result.error;
-
-        if (isSignUp && !result.data.session) {
-          showNotice($("authNotice"), "Conta criada. Confirme seu e-mail antes de entrar.", "success");
-        } else if (result.data.user) {
-          setLoggedIn(result.data.user);
+          if (data.session) {
+            await startApp(data.user);
+          } else {
+            showNotice(
+              "Conta criada. Confira seu e-mail para confirmar o cadastro e depois entre.",
+              "success",
+              "authNotice"
+            );
+          }
+        } else {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          await startApp(data.user);
         }
       } catch (error) {
-        showNotice($("authNotice"), error.message || "Não foi possível autenticar.");
+        console.error(error);
+        showNotice(error.message || "Não foi possível autenticar.", "error", "authNotice");
       } finally {
-        $("authSubmit").disabled = false;
-        updateAuthForm();
+        submit.disabled = false;
+        submit.textContent = authSignup ? "Criar conta" : "Entrar";
       }
+    });
+
+    $("switchAuth").addEventListener("click", () => {
+      authSignup = !authSignup;
+      $("authTitle").textContent = authSignup ? "Crie sua conta" : "Entre na sua conta";
+      $("authDescription").textContent = authSignup
+        ? "Use seu e-mail e crie uma senha com pelo menos 6 caracteres."
+        : "Organize agenda, clientes e equipe em um só lugar.";
+      $("authSubmit").textContent = authSignup ? "Criar conta" : "Entrar";
+      $("switchAuth").textContent = authSignup ? "Já tenho uma conta" : "Criar uma conta";
+      $("password").autocomplete = authSignup ? "new-password" : "current-password";
+      $("authNotice").className = "notice";
     });
 
     $("logoutButton").addEventListener("click", async () => {
-      if (supabase) await supabase.auth.signOut();
-      setLoggedOut();
-    });
+      const { error } = await supabase.auth.signOut();
 
-    $("newBookingButton").addEventListener("click", () => $("bookingDialog").showModal());
-    $("sideNewBooking").addEventListener("click", () => $("bookingDialog").showModal());
-    $("closeDialog").addEventListener("click", () => $("bookingDialog").close());
-    $("refreshButton").addEventListener("click", loadDashboard);
-
-    $("sideClients").addEventListener("click", () => {
-      showNotice($("appNotice"), "O cadastro de clientes é criado junto com o primeiro agendamento neste MVP.", "success");
-    });
-
-    $("bookingForm").addEventListener("submit", async (event) => {
-      event.preventDefault();
-      clearNotice($("appNotice"));
-
-      if (!supabase || !currentUser) {
-        showNotice($("appNotice"), "Entre na sua conta e configure o Supabase para salvar agendamentos.");
+      if (error) {
+        showNotice(error.message, "error");
         return;
       }
 
-      const submitButton = $("bookingForm").querySelector('button[type="submit"]');
-      submitButton.disabled = true;
-      submitButton.textContent = "Salvando...";
+      user = null;
+      $("app").classList.add("hidden");
+      $("loginScreen").classList.remove("hidden");
+    });
+
+    $("themeButton").addEventListener("click", toggleTheme);
+    $("copyLinkButton").addEventListener("click", copyBookingLink);
+
+    $("quickBookButton").addEventListener("click", appointmentForm);
+    $("closeDialog").addEventListener("click", () => $("formDialog").close());
+
+    $("formDialog").addEventListener("click", event => {
+      if (event.target === $("formDialog")) $("formDialog").close();
+    });
+
+    document.querySelectorAll(".nav-item").forEach(button => {
+      button.addEventListener("click", () => {
+        page = button.dataset.page;
+        renderPage();
+        closeSidebar();
+      });
+    });
+
+    $("menuButton").addEventListener("click", () => {
+      $("sidebar").classList.toggle("open");
+      $("backdrop").classList.toggle("show");
+    });
+
+    $("backdrop").addEventListener("click", closeSidebar);
+
+    $("pageContent").addEventListener("click", async event => {
+      const openButton = event.target.closest("[data-open]");
+      const cancelButton = event.target.closest("[data-cancel]");
 
       try {
-        const clientName = $("clientName").value.trim();
-        const clientPhone = $("clientPhone").value.trim() || null;
+        if (openButton) {
+          const action = openButton.dataset.open;
 
-        const { error } = await supabase.from("appointments").insert({
-          user_id: currentUser.id,
-          client_name: clientName,
-          client_phone: clientPhone,
-          service_name: $("serviceName").value.trim(),
-          appointment_date: $("bookingDate").value,
-          appointment_time: $("bookingTime").value,
-          status: "scheduled"
-        });
+          if (action === "client") clientForm();
+          if (action === "professional") professionalForm();
+          if (action === "appointment") appointmentForm();
+          if (action === "anamnese") anamneseForm();
+        }
 
-        if (error) throw error;
+        if (cancelButton) {
+          await cancelAppointment(cancelButton.dataset.cancel);
+        }
 
-        $("bookingForm").reset();
-        $("bookingDialog").close();
-        showNotice($("appNotice"), "Agendamento salvo com sucesso.", "success");
-        await loadDashboard();
+        if (event.target.closest("#saveSettings")) {
+          await saveBusinessSettings();
+        }
+
+        if (event.target.closest("#saveCalendar")) {
+          await saveCalendarSettings();
+        }
       } catch (error) {
-        showNotice($("appNotice"), error.message || "Não foi possível salvar o agendamento.");
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Salvar agendamento";
+        console.error(error);
+        showNotice(error.message || "Não foi possível concluir a operação.", "error");
       }
     });
 
-    async function loadDashboard() {
-      if (!supabase || !currentUser) return;
-
-      const today = new Date().toLocaleDateString("en-CA");
+    $("dialogContent").addEventListener("submit", async event => {
+      event.preventDefault();
+      const form = event.target;
 
       try {
-        const { data: appointments, error: appointmentsError } = await supabase
-          .from("appointments")
-          .select("*")
-          .eq("user_id", currentUser.id)
-          .gte("appointment_date", today)
-          .order("appointment_date", { ascending: true })
-          .order("appointment_time", { ascending: true });
-
-        if (appointmentsError) throw appointmentsError;
-
-        const { count, error: countError } = await supabase
-          .from("appointments")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", currentUser.id);
-
-        if (countError) throw countError;
-
-        const rows = appointments || [];
-        $("todayCount").textContent = rows.filter(row => row.appointment_date === today).length;
-        $("upcomingCount").textContent = rows.length;
-        $("clientsCount").textContent = count ?? 0;
-
-        const table = $("bookingsTable");
-        table.replaceChildren();
-
-        if (!rows.length) {
-          $("emptyState").classList.remove("hidden");
-          return;
-        }
-
-        $("emptyState").classList.add("hidden");
-
-        rows.slice(0, 20).forEach((booking) => {
-          const tr = document.createElement("tr");
-          const clientCell = document.createElement("td");
-          const serviceCell = document.createElement("td");
-          const dateCell = document.createElement("td");
-          const statusCell = document.createElement("td");
-
-          const name = document.createElement("div");
-          name.className = "client-name";
-          name.textContent = booking.client_name;
-          clientCell.appendChild(name);
-
-          if (booking.client_phone) {
-            const phone = document.createElement("div");
-            phone.className = "subtext";
-            phone.textContent = booking.client_phone;
-            clientCell.appendChild(phone);
-          }
-
-          serviceCell.textContent = booking.service_name;
-          dateCell.textContent = formatDate(booking.appointment_date, booking.appointment_time);
-
-          const badge = document.createElement("span");
-          badge.className = "badge";
-          badge.textContent = booking.status === "scheduled" ? "● Agendado" : booking.status;
-          statusCell.appendChild(badge);
-
-          tr.append(clientCell, serviceCell, dateCell, statusCell);
-          table.appendChild(tr);
-        });
+        if (form.id === "clientForm") await saveClient(form);
+        if (form.id === "professionalForm") await saveProfessional(form);
+        if (form.id === "appointmentForm") await saveAppointment(form);
+        if (form.id === "anamneseForm") await saveAnamnese(form);
       } catch (error) {
-        showNotice($("appNotice"), error.message || "Não foi possível carregar os dados.");
+        console.error(error);
+        showNotice(error.message || "Não foi possível salvar o formulário.", "error");
       }
-    }
+    });
 
-    if (supabase) {
-      supabase.auth.getSession().then(({ data }) => {
-        if (data.session?.user) setLoggedIn(data.session.user);
-      });
+    $("themeSelect")?.addEventListener("change", event => {
+      settings.theme = event.target.value;
+      applyTheme();
+    });
 
-      supabase.auth.onAuthStateChange((_event, session) => {
-        if (session?.user) setLoggedIn(session.user);
-        else setLoggedOut();
-      });
-    } else {
-      showNotice($("authNotice"), "Para ativar o app, configure as credenciais do Supabase no código.");
+    $("primaryColor")?.addEventListener("input", event => {
+      settings.primary_color = event.target.value;
+      applyTheme();
+    });
+
+    $("salonName")?.addEventListener("input", event => {
+      settings.salon_name = event.target.value || "Beauty Flow";
+      updateBrand();
+    });
+
+    $("unitName")?.addEventListener("input", event => {
+      settings.unit_name = event.target.value || "Minha unidade";
+      updateBrand();
+    });
+
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user && !user) {
+        startApp(session.user);
+      } else if (!session?.user && user) {
+        user = null;
+        $("app").classList.add("hidden");
+        $("loginScreen").classList.remove("hidden");
+      }
+    });
+
+    const { data: authData, error: authError } = await supabase.auth.getSession();
+
+    if (authError) {
+      console.error(authError);
+      showNotice(authError.message, "error", "authNotice");
+    } else if (authData.session?.user) {
+      await startApp(authData.session.user);
     }
   </script>
 </body>
-</html>
+</html></style></head><body><div class="preview-root"><h1>Preview</h1><p>Estilos aplicados ao documento de exemplo.</p><button class="btn">Botão</button><div class="card price-card best-offer"><div class="price-name">Plano</div><div class="price-value">R$ 99</div></div></div></body></html>
