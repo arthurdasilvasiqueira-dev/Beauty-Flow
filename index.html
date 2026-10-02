@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>BeautyFlow Pro — Painel</title>
+  <title>BeautyFlow Pro — Gestão Completa & Agendamento</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap');
 
@@ -20,18 +20,19 @@
       --success-light: #e6f6ee;
       --warning: #b54708;
       --warning-light: #fffaeb;
-      --sidebar-w: 240px;
+      --danger: #b42318;
+      --sidebar-w: 250px;
       --radius: 12px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
     body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; }
-    button, input, select { font-family: inherit; }
+    button, input, select, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
-    /* OVERLAY MOBILE */
+    /* BACKDROP */
     .backdrop {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 50;
-      opacity: 0; pointer-events: none; transition: opacity .2s ease;
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 50;
+      opacity: 0; pointer-events: none; transition: opacity .25s ease;
     }
     .backdrop.active { opacity: 1; pointer-events: auto; }
 
@@ -42,21 +43,21 @@
       display: flex; flex-direction: column; transition: transform .25s ease;
     }
     .brand { height: 64px; padding: 0 18px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
-    .brand-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--primary); color: #fff; font-weight: 800; display: grid; place-items: center; }
+    .brand-icon { width: 34px; height: 34px; border-radius: 9px; background: var(--primary); color: #fff; font-weight: 800; display: grid; place-items: center; font-size: 16px; }
     .brand-title { font-family: 'Manrope', sans-serif; font-weight: 800; font-size: 15px; }
     .brand-title span { color: var(--primary); }
 
-    .nav-list { list-style: none; padding: 14px 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .nav-list { list-style: none; padding: 12px 8px; display: flex; flex-direction: column; gap: 3px; flex: 1; overflow-y: auto; }
     .nav-btn {
-      width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+      width: 100%; display: flex; align-items: center; gap: 10px; padding: 9px 12px;
       background: transparent; border: 0; border-radius: 8px; font-size: 13px; font-weight: 600;
-      color: #555; cursor: pointer; text-align: left;
+      color: #555; cursor: pointer; text-align: left; transition: background .15s;
     }
     .nav-btn:hover { background: #f2f1ed; color: var(--text); }
     .nav-btn.active { background: var(--primary-light); color: var(--primary); }
-    .badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+    .nav-badge { margin-left: auto; background: var(--primary); color: #fff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
 
-    /* LAYOUT PRINCIPAL */
+    /* TOPBAR & MAIN */
     .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-width: 0; }
     .topbar {
       height: 64px; background: var(--surface); border-bottom: 1px solid var(--border);
@@ -71,112 +72,100 @@
     .unit-tag { font-size: 13px; color: var(--text-muted); }
     .unit-tag strong { color: var(--text); }
 
-    .btn-icon {
-      width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 8px;
-      background: #fff; cursor: pointer; display: grid; place-items: center; position: relative;
-    }
-    .btn-icon .dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; background: #e03131; border-radius: 50%; }
-
-    .btn-primary {
+    .btn-action {
       background: var(--primary); color: #fff; border: 0; border-radius: 8px;
       padding: 0 14px; height: 36px; font-size: 12px; font-weight: 700; cursor: pointer;
-      display: flex; align-items: center; gap: 6px;
+      display: inline-flex; align-items: center; gap: 6px; text-decoration: none;
     }
-    .btn-primary:active { transform: scale(0.98); }
+    .btn-action:hover { background: var(--primary-hover); }
+    .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #f2f1ed; }
 
     /* CONTEÚDO */
-    .content { padding: 20px; max-width: 1200px; width: 100%; margin: 0 auto; }
+    .content { padding: 22px; max-width: 1200px; width: 100%; margin: 0 auto; }
     .view-page { display: none; }
     .view-page.active { display: block; }
 
-    .page-title { margin-bottom: 18px; }
+    .page-title { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; gap: 12px; flex-wrap: wrap; }
     .page-title h1 { font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.4px; }
-    .page-title p { color: var(--text-muted); font-size: 12px; margin-top: 3px; }
+    .page-title p { color: var(--text-muted); font-size: 13px; margin-top: 2px; }
 
-    /* METRICAS */
-    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    /* CARDS & TABELAS */
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .card-m { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
     .card-m small { color: var(--text-muted); font-size: 11px; font-weight: 600; text-transform: uppercase; }
     .card-m .val { font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; margin: 6px 0; }
     .card-m .tag { font-size: 11px; font-weight: 600; color: var(--success); }
 
-    /* LISTA DE AGENDAMENTOS */
-    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-    .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--border); font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; }
-    .list-item {
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
+    .panel { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+    .panel-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-family: 'Manrope', sans-serif; font-weight: 700; font-size: 14px; }
+    
+    .table-responsive { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    th { background: #faf9f7; padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text-muted); font-weight: 600; }
+    td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+    tr:last-child td { border-bottom: 0; }
+
+    .pill { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 700; background: var(--success-light); color: var(--success); }
+    .pill.orange { background: var(--warning-light); color: var(--warning); }
+    .pill.blue { background: var(--primary-light); color: var(--primary); }
+
+    /* FORMULÁRIOS & CONFIGURAÇÃO */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; padding: 18px; }
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label { font-size: 11px; font-weight: 700; color: #444; }
+    .field input, .field select, .field textarea {
+      height: 38px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; font-size: 13px; outline: none; background: #fff;
     }
-    .list-item:last-child { border-bottom: 0; }
-    .item-meta strong { display: block; font-size: 13px; margin-bottom: 3px; }
-    .item-meta span { font-size: 11px; color: var(--text-muted); }
-    .pill { padding: 4px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; background: var(--success-light); color: var(--success); }
+    .field textarea { height: 75px; padding: 8px 10px; resize: vertical; }
+    .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--primary); }
 
     /* MODAL */
-    .modal-wrap {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100;
-      display: none; place-items: center; padding: 16px;
-    }
+    .modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; display: none; place-items: center; padding: 16px; }
     .modal-wrap.open { display: grid; }
-    .modal {
-      background: #fff; width: 100%; max-width: 420px; border-radius: 14px;
-      overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-    }
-    .modal-head {
-      padding: 14px 18px; border-bottom: 1px solid var(--border);
-      display: flex; justify-content: space-between; align-items: center;
-    }
+    .modal { background: #fff; width: 100%; max-width: 440px; border-radius: 14px; overflow: hidden; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+    .modal-head { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
     .modal-head h3 { font-family: 'Manrope', sans-serif; font-size: 15px; font-weight: 700; }
     .close-btn { background: none; border: 0; font-size: 20px; cursor: pointer; color: var(--text-muted); }
-
-    .modal-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; }
-    .field label { display: block; font-size: 11px; font-weight: 700; color: #444; margin-bottom: 4px; }
-    .field input, .field select {
-      width: 100%; height: 38px; border: 1px solid var(--border); border-radius: 8px;
-      padding: 0 10px; font-size: 13px; outline: none; background: #fff;
-    }
-    .field input:focus, .field select:focus { border-color: var(--primary); }
-
+    .modal-body { padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; max-height: 70vh; overflow-y: auto; }
     .modal-foot { padding: 12px 18px; background: #fbfbfa; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; }
-    .btn-cancel { background: transparent; border: 1px solid var(--border); padding: 0 12px; height: 34px; border-radius: 7px; font-size: 12px; font-weight: 600; cursor: pointer; }
 
     /* TOAST */
     .toast {
-      position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 320px; margin: 0 auto;
-      background: #1c1a1f; color: #fff; padding: 12px 16px; border-radius: 10px;
-      font-size: 12px; font-weight: 500; text-align: center; opacity: 0; transform: translateY(20px);
-      transition: all .25s ease; pointer-events: none; z-index: 200;
+      position: fixed; bottom: 20px; right: 20px; left: 20px; max-width: 340px; margin: 0 auto;
+      background: #1c1a1f; color: #fff; padding: 12px 16px; border-radius: 10px; font-size: 12px; font-weight: 500;
+      text-align: center; opacity: 0; transform: translateY(20px); transition: all .25s ease; pointer-events: none; z-index: 200;
     }
     .toast.show { opacity: 1; transform: translateY(0); }
 
-    /* RESPONSIVIDADE (CELULARES) */
+    /* RESPONSIVIDADE */
     @media (max-width: 800px) {
       .sidebar { transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
       .main { margin-left: 0; }
       .menu-toggle { display: grid; }
-      .unit-tag { font-size: 11px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Backdrop para clique fora no mobile -->
   <div class="backdrop" id="backdrop"></div>
 
-  <!-- SIDEBAR NAVEGÁVEL -->
+  <!-- MENU LATERAL -->
   <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <div class="brand-icon">B</div>
-      <div class="brand-title">Beauty<span>Flow</span> Pro</div>
+      <div class="brand-icon" id="logoPreview">B</div>
+      <div class="brand-title"><span id="sidebarOrgName">BeautyFlow</span> Pro</div>
     </div>
 
     <ul class="nav-list">
-      <li><button class="nav-btn active" data-page="dash">📊 Visão Geral</button></li>
-      <li><button class="nav-btn" data-page="agenda">📅 Agenda <span class="badge" id="badgeTotal">3</span></button></li>
-      <li><button class="nav-btn" data-page="clientes">👥 Clientes</button></li>
-      <li><button class="nav-btn" data-page="financeiro">💳 Financeiro</button></li>
-      <li><button class="nav-btn" data-page="config">⚙️ Configurações</button></li>
+      <li><button class="nav-btn active" data-page="dash">📊 Painel Operacional</button></li>
+      <li><button class="nav-btn" data-page="agenda">📅 Gestão da Agenda <span class="nav-badge" id="badgeAgenda">0</span></button></li>
+      <li><button class="nav-btn" data-page="google">🔄 Google Agenda</button></li>
+      <li><button class="nav-btn" data-page="clientes">👥 Clientes & CRM</button></li>
+      <li><button class="nav-btn" data-page="anamnese">📝 Fichas de Anamnese</button></li>
+      <li><button class="nav-btn" data-page="equipe">✂️ Equipe & Comissões</button></li>
+      <li><button class="nav-btn" data-page="personalizar">🎨 Personalização & Link</button></li>
     </ul>
   </aside>
 
@@ -185,270 +174,423 @@
     <header class="topbar">
       <div class="top-left">
         <button class="menu-toggle" id="btnToggleMenu" aria-label="Abrir Menu">☰</button>
-        <span class="unit-tag">Unidade: <strong>Jardins</strong></span>
+        <span class="unit-tag">Unidade: <strong id="topbarUnitName">Configurar Unidade</strong></span>
       </div>
       <div class="top-right">
-        <button class="btn-icon" id="btnNotif" aria-label="Notificações">
-          🔔<span class="dot"></span>
+        <button class="btn-action btn-secondary" id="btnShareBooking" title="Copiar Link de Agendamento">
+          🔗 Link de Agendamento
         </button>
-        <button class="btn-primary" id="btnOpenModal">
-          <span>+</span> Novo Agendamento
+        <button class="btn-action" id="btnOpenBookingModal">
+          <span>+</span> Agendar Horário
         </button>
       </div>
     </header>
 
     <div class="content">
 
-      <!-- PÁGINA: DASHBOARD -->
+      <!-- 1. DASHBOARD -->
       <section class="view-page active" id="page-dash">
         <div class="page-title">
-          <h1>Painel de Controle</h1>
-          <p>Visão em tempo real das marcações de hoje.</p>
+          <div>
+            <h1>Visão Geral</h1>
+            <p>Monitore os atendimentos, clientes e desempenho do seu espaço em tempo real.</p>
+          </div>
         </div>
 
         <div class="metrics">
           <div class="card-m">
-            <small>Atendimentos Hoje</small>
-            <div class="val" id="metricCount">3</div>
-            <span class="tag">↑ 100% online</span>
-          </div>
-          <div class="card-m">
-            <small>Faturamento Estimado</small>
-            <div class="val" id="metricTotal">R$ 290</div>
+            <small>Atendimentos Marcados</small>
+            <div class="val" id="metricBookings">0</div>
             <span class="tag">Atualizado agora</span>
           </div>
           <div class="card-m">
-            <small>Ocupação</small>
-            <div class="val">65%</div>
-            <span class="tag">4 vagas livres</span>
+            <small>Faturamento Previsto</small>
+            <div class="val" id="metricRevenue">R$ 0,00</div>
+            <span class="tag">Total bruto</span>
+          </div>
+          <div class="card-m">
+            <small>Comissões a Repassar</small>
+            <div class="val" id="metricCommissions">R$ 0,00</div>
+            <span class="tag">Estimativa calculada</span>
+          </div>
+          <div class="card-m">
+            <small>Clientes Cadastrados</small>
+            <div class="val" id="metricClients">0</div>
+            <span class="tag">Fichas salvas</span>
           </div>
         </div>
 
         <div class="panel">
-          <div class="panel-head">Atendimentos Agendados para Hoje</div>
-          <div id="appointmentsList">
-            <div class="list-item">
-              <div class="item-meta">
-                <strong>Mariana Silva — Corte e Escova</strong>
-                <span>09:30 • Profissional: Camila</span>
-              </div>
-              <span class="pill">Confirmado</span>
+          <div class="panel-head">
+            <span>Próximos Agendamentos</span>
+            <button class="btn-action btn-secondary" onclick="document.querySelector('[data-page=agenda]').click()">Ver Agenda Completa</button>
+          </div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Serviço</th>
+                  <th>Horário</th>
+                  <th>Profissional</th>
+                  <th>Origem</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="dashTableBody">
+                <tr><td colspan="6" style="text-align:center; color: var(--text-muted); padding: 24px;">Nenhum agendamento realizado ainda. Clique em "+ Agendar Horário".</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. GESTÃO DA AGENDA -->
+      <section class="view-page" id="page-agenda">
+        <div class="page-title">
+          <div>
+            <h1>Agenda do Estabelecimento</h1>
+            <p>Gerencie horários locais e visualize períodos sincronizados.</p>
+          </div>
+          <button class="btn-action" onclick="openBookingModal()">+ Novo Agendamento</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">Compromissos Agendados</div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data/Hora</th>
+                  <th>Cliente</th>
+                  <th>Serviço</th>
+                  <th>Valor</th>
+                  <th>Profissional</th>
+                  <th>Comissão</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="agendaTableBody">
+                <!-- Inserido dinamicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. GOOGLE CALENDAR -->
+      <section class="view-page" id="page-google">
+        <div class="page-title">
+          <div>
+            <h1>Sincronização com Google Agenda</h1>
+            <p>Escolha operar apenas com a agenda nativa do sistema ou ativar o espelhamento bidirecional.</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">Modo de Operação da Agenda</div>
+          <div style="padding: 20px;">
+            <div class="field" style="margin-bottom: 16px;">
+              <label>Escolha o Modo Principal</label>
+              <select id="googleModeSelect" onchange="toggleGoogleSyncMode()">
+                <option value="internal">Agenda Interna do Sistema (Padrão e Independente)</option>
+                <option value="google">Vincular e Sincronizar com Google Agenda (OAuth 2.0)</option>
+              </select>
             </div>
-            <div class="list-item">
-              <div class="item-meta">
-                <strong>Juliana Freitas — Manicure Completa</strong>
-                <span>11:00 • Profissional: Beatriz</span>
+
+            <div id="googleConfigArea" style="display: none; background: #faf9f7; border: 1px dashed var(--border); padding: 16px; border-radius: 8px;">
+              <p style="font-size: 13px; margin-bottom: 12px;">Para espelhamento direto entre o sistema e o Google Calendar de cada profissional, o sistema consome a Google Calendar API (v3).</p>
+              
+              <div class="field" style="margin-bottom: 12px;">
+                <label>Conta Google Conectada</label>
+                <input type="email" id="googleAccountEmail" placeholder="profissional@gmail.com">
               </div>
-              <span class="pill">Confirmado</span>
-            </div>
-            <div class="list-item">
-              <div class="item-meta">
-                <strong>Carla Souza — Design de Sobrancelha</strong>
-                <span>14:00 • Profissional: Camila</span>
+
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <button class="btn-action" onclick="saveGoogleSettings()">Salvar Conexão Google</button>
+                <span id="googleStatusBadge" class="pill orange">Desconectado</span>
               </div>
-              <span class="pill">Confirmado</span>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- PÁGINA: AGENDA -->
-      <section class="view-page" id="page-agenda">
-        <div class="page-title">
-          <h1>Agenda Semanal</h1>
-          <p>Sincronizada com o Google Calendar em tempo real.</p>
-        </div>
-        <div class="panel" style="padding: 24px; text-align: center; color: var(--text-muted);">
-          Visualização detalhada da grade semanal liberada. Use o botão <strong>+ Novo Agendamento</strong> para adicionar horários.
-        </div>
-      </section>
-
-      <!-- PÁGINA: CLIENTES -->
+      <!-- 4. CLIENTES & CRM -->
       <section class="view-page" id="page-clientes">
         <div class="page-title">
-          <h1>Base de Clientes</h1>
-          <p>Contatos e fichas de anamnese digital.</p>
+          <div>
+            <h1>Base de Clientes & CRM</h1>
+            <p>Histórico, preferências e cadastro unificado.</p>
+          </div>
+          <button class="btn-action" onclick="openClientModal()">+ Cadastrar Cliente</button>
         </div>
-        <div class="panel" style="padding: 24px; text-align: center; color: var(--text-muted);">
-          3 clientes ativos cadastrados nesta unidade.
+
+        <div class="panel">
+          <div class="panel-head">Lista de Clientes</div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome Completo</th>
+                  <th>Telefone / WhatsApp</th>
+                  <th>E-mail</th>
+                  <th>Histórico</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="clientsTableBody">
+                <!-- Inserido dinamicamente -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!-- PÁGINA: FINANCEIRO -->
-      <section class="view-page" id="page-financeiro">
+      <!-- 5. FICHAS DE ANAMNESE -->
+      <section class="view-page" id="page-anamnese">
         <div class="page-title">
-          <h1>Financeiro & Comissões</h1>
-          <p>Fluxo de caixa diário e repasses.</p>
+          <div>
+            <h1>Fichas de Anamnese Digital</h1>
+            <p>Formulários de sensibilidade, histórico de procedimentos e termos de consentimento.</p>
+          </div>
+          <button class="btn-action" onclick="openAnamneseModal()">+ Preencher Nova Ficha</button>
         </div>
-        <div class="panel" style="padding: 24px; text-align: center; color: var(--text-muted);">
-          Caixa aberto. Total registrado hoje: <strong>R$ 290,00</strong>.
+
+        <div class="panel">
+          <div class="panel-head">Fichas Cadastradas</div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Data</th>
+                  <th>Alergias / Sensibilidades</th>
+                  <th>Histórico Químico</th>
+                  <th>Consentimento</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="anamneseTableBody">
+                <!-- Inserido dinamicamente -->
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
-      <!-- PÁGINA: CONFIGURAÇÕES -->
-      <section class="view-page" id="page-config">
+      <!-- 6. EQUIPE & COMISSÕES -->
+      <section class="view-page" id="page-equipe">
         <div class="page-title">
-          <h1>Configurações da Unidade</h1>
-          <p>Preferências, horários e equipe.</p>
+          <div>
+            <h1>Equipe & Regras de Comissões</h1>
+            <p>Cadastre os profissionais e estabeleça as porcentagens de repasse financeiro.</p>
+          </div>
+          <button class="btn-action" onclick="openStaffModal()">+ Cadastrar Profissional</button>
         </div>
-        <div class="panel" style="padding: 24px; text-align: center; color: var(--text-muted);">
-          Integração com Google Calendar: <strong>Conectado via OAuth</strong>.
+
+        <div class="panel">
+          <div class="panel-head">Profissionais Ativos</div>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nome</th>
+                  <th>Especialidade</th>
+                  <th>Comissão (%)</th>
+                  <th>Modo de Agenda</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="staffTableBody">
+                <!-- Inserido dinamicamente -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. PERSONALIZAÇÃO & LINK PÚBLICO -->
+      <section class="view-page" id="page-personalizar">
+        <div class="page-title">
+          <div>
+            <h1>Personalização & Link de Agendamento</h1>
+            <p>Configure a identidade visual do seu salão e copie o link público para seus clientes.</p>
+          </div>
+          <button class="btn-action" onclick="saveSettings()">Salvar Configurações</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">Dados da Empresa & Identidade</div>
+          <div class="form-grid">
+            <div class="field">
+              <label>Nome do Estabelecimento</label>
+              <input type="text" id="cfgOrgName" placeholder="Ex: Studio Bella Donna">
+            </div>
+            <div class="field">
+              <label>Nome da Unidade</label>
+              <input type="text" id="cfgUnitName" placeholder="Ex: Matriz Centro">
+            </div>
+            <div class="field">
+              <label>Cor Primária (Tema)</label>
+              <input type="color" id="cfgColor" value="#6941c6" style="height:40px; padding:2px;">
+            </div>
+            <div class="field">
+              <label>Telefone / WhatsApp de Contato</label>
+              <input type="text" id="cfgPhone" placeholder="(11) 99999-9999">
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">Link Público de Autoatendimento</div>
+          <div style="padding: 20px;">
+            <p style="font-size:13px; color: var(--text-muted); margin-bottom: 12px;">Seus clientes podem agendar 24h por dia diretamente por este endereço:</p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <input type="text" id="cfgPublicLink" readonly style="flex:1; min-width: 250px; height: 38px; border: 1px solid var(--border); border-radius: 8px; padding: 0 10px; background: #faf9f7;">
+              <button class="btn-action" onclick="copyPublicLink()">Copiar Link</button>
+            </div>
+          </div>
         </div>
       </section>
 
     </div>
   </div>
 
-  <!-- MODAL DE NOVO AGENDAMENTO -->
+  <!-- MODAL: AGENDAMENTO -->
   <div class="modal-wrap" id="modalBooking">
     <div class="modal">
       <div class="modal-head">
         <h3>Novo Agendamento</h3>
-        <button class="close-btn" id="btnCloseModal">&times;</button>
+        <button class="close-btn" onclick="closeModal('modalBooking')">&times;</button>
       </div>
-      <form id="formBooking">
+      <form id="formBooking" onsubmit="handleCreateBooking(event)">
         <div class="modal-body">
           <div class="field">
-            <label>Nome do Cliente</label>
-            <input type="text" id="inputClient" placeholder="Ex: Fernanda Lima" required>
+            <label>Selecione o Cliente</label>
+            <select id="bClientSelect" required></select>
           </div>
           <div class="field">
             <label>Serviço</label>
-            <select id="selectService">
-              <option value="Corte e Escova|120">Corte e Escova (R$ 120)</option>
-              <option value="Manicure|50">Manicure (R$ 50)</option>
-              <option value="Design de Sobrancelha|45">Design de Sobrancelha (R$ 45)</option>
-              <option value="Coloração Global|200">Coloração Global (R$ 200)</option>
+            <select id="bServiceSelect" required onchange="updateServicePrice()">
+              <option value="Corte e Finalização|120">Corte e Finalização — R$ 120,00</option>
+              <option value="Manicure & Pedicure|65">Manicure & Pedicure — R$ 65,00</option>
+              <option value="Coloração Completa|220">Coloração Completa — R$ 220,00</option>
+              <option value="Design de Sobrancelha|50">Design de Sobrancelha — R$ 50,00</option>
             </select>
           </div>
           <div class="field">
-            <label>Horário</label>
-            <input type="time" id="inputTime" value="15:30" required>
+            <label>Profissional Designado</label>
+            <select id="bStaffSelect" required></select>
           </div>
           <div class="field">
-            <label>Profissional</label>
-            <select id="selectStaff">
-              <option>Camila (Cabelo)</option>
-              <option>Beatriz (Unhas)</option>
-              <option>Laura (Estética)</option>
+            <label>Data & Horário</label>
+            <input type="datetime-local" id="bDateTime" required>
+          </div>
+          <div class="field">
+            <label>Origem do Agendamento</label>
+            <select id="bOrigin">
+              <option value="Sistema Interno">Agenda Interna</option>
+              <option value="Google Calendar">Google Agenda (Espelhado)</option>
+              <option value="Link do Cliente">Autoatendimento Online</option>
             </select>
           </div>
         </div>
         <div class="modal-foot">
-          <button type="button" class="btn-cancel" id="btnCancelModal">Cancelar</button>
-          <button type="submit" class="btn-primary">Salvar Reserva</button>
+          <button type="button" class="btn-action btn-secondary" onclick="closeModal('modalBooking')">Cancelar</button>
+          <button type="submit" class="btn-action">Salvar Reserva</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- NOTIFICAÇÃO TOAST -->
-  <div class="toast" id="toast"></div>
-
-  <!-- JAVASCRIPT EXECUTÁVEL COMPLETO -->
-  <script>
-    // ELEMENTOS
-    const sidebar = document.getElementById('sidebar');
-    const backdrop = document.getElementById('backdrop');
-    const btnToggleMenu = document.getElementById('btnToggleMenu');
-    const modal = document.getElementById('modalBooking');
-    const btnOpenModal = document.getElementById('btnOpenModal');
-    const btnCloseModal = document.getElementById('btnCloseModal');
-    const btnCancelModal = document.getElementById('btnCancelModal');
-    const formBooking = document.getElementById('formBooking');
-    const toast = document.getElementById('toast');
-    const appointmentsList = document.getElementById('appointmentsList');
-    const metricCount = document.getElementById('metricCount');
-    const badgeTotal = document.getElementById('badgeTotal');
-    const metricTotal = document.getElementById('metricTotal');
-    const btnNotif = document.getElementById('btnNotif');
-
-    let totalAppointments = 3;
-    let revenueTotal = 290;
-
-    // MOSTRAR TOAST
-    function showToast(msg) {
-      toast.textContent = msg;
-      toast.classList.add('show');
-      setTimeout(() => toast.classList.remove('show'), 2800);
-    }
-
-    // ABRIR/FECHAR MENU MOBILE
-    function toggleMobileMenu() {
-      const isOpen = sidebar.classList.toggle('open');
-      backdrop.classList.toggle('active', isOpen);
-    }
-
-    btnToggleMenu.addEventListener('click', toggleMobileMenu);
-    backdrop.addEventListener('click', () => {
-      sidebar.classList.remove('open');
-      backdrop.classList.remove('active');
-    });
-
-    // TROCA DE PÁGINAS (TABS)
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.view-page').forEach(p => p.classList.remove('active'));
-
-        btn.classList.add('active');
-        const targetPage = document.getElementById('page-' + btn.dataset.page);
-        if (targetPage) targetPage.classList.add('active');
-
-        // Fecha menu no celular se estiver aberto
-        sidebar.classList.remove('open');
-        backdrop.classList.remove('active');
-      });
-    });
-
-    // CONTROLE DO MODAL
-    function openModal() { modal.classList.add('open'); }
-    function closeModal() { modal.classList.remove('open'); formBooking.reset(); }
-
-    btnOpenModal.addEventListener('click', openModal);
-    btnCloseModal.addEventListener('click', closeModal);
-    btnCancelModal.addEventListener('click', closeModal);
-
-    // ADICIONAR NOVO AGENDAMENTO
-    formBooking.addEventListener('submit', (e) => {
-      e.preventDefault();
-      
-      const client = document.getElementById('inputClient').value.trim();
-      const serviceRaw = document.getElementById('selectService').value;
-      const [serviceName, servicePrice] = serviceRaw.split('|');
-      const time = document.getElementById('inputTime').value;
-      const staff = document.getElementById('selectStaff').value;
-
-      if (!client) return;
-
-      // Cria item na lista
-      const item = document.createElement('div');
-      item.className = 'list-item';
-      item.innerHTML = `
-        <div class="item-meta">
-          <strong>${client} — ${serviceName}</strong>
-          <span>${time} • Profissional: ${staff.split(' ')[0]}</span>
+  <!-- MODAL: CADASTRAR CLIENTE -->
+  <div class="modal-wrap" id="modalClient">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Cadastrar Cliente</h3>
+        <button class="close-btn" onclick="closeModal('modalClient')">&times;</button>
+      </div>
+      <form id="formClient" onsubmit="handleCreateClient(event)">
+        <div class="modal-body">
+          <div class="field">
+            <label>Nome Completo</label>
+            <input type="text" id="cName" required placeholder="Ex: Juliana Oliveira">
+          </div>
+          <div class="field">
+            <label>WhatsApp / Telefone</label>
+            <input type="tel" id="cPhone" required placeholder="(11) 98888-7777">
+          </div>
+          <div class="field">
+            <label>E-mail (opcional)</label>
+            <input type="email" id="cEmail" placeholder="cliente@email.com">
+          </div>
         </div>
-        <span class="pill">Confirmado</span>
-      `;
-      appointmentsList.prepend(item);
+        <div class="modal-foot">
+          <button type="button" class="btn-action btn-secondary" onclick="closeModal('modalClient')">Cancelar</button>
+          <button type="submit" class="btn-action">Cadastrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-      // Atualiza contadores
-      totalAppointments++;
-      revenueTotal += parseInt(servicePrice, 10);
+  <!-- MODAL: ANAMNESE DIGITAL -->
+  <div class="modal-wrap" id="modalAnamnese">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Ficha de Anamnese Digital</h3>
+        <button class="close-btn" onclick="closeModal('modalAnamnese')">&times;</button>
+      </div>
+      <form id="formAnamnese" onsubmit="handleCreateAnamnese(event)">
+        <div class="modal-body">
+          <div class="field">
+            <label>Selecione o Cliente</label>
+            <select id="aClientSelect" required></select>
+          </div>
+          <div class="field">
+            <label>Alergias ou Hipersensibilidades Declaradas</label>
+            <input type="text" id="aAllergies" placeholder="Nenhuma ou especificar (ex: amônia, esmalte)">
+          </div>
+          <div class="field">
+            <label>Histórico Químico / Procedimentos Anteriores</label>
+            <textarea id="aHistory" placeholder="Ex: Descoloração recente, botox capilar há 2 meses..."></textarea>
+          </div>
+          <div class="field">
+            <label>Termo de Consentimento & Ciência</label>
+            <select id="aConsent">
+              <option value="Aceito e Assinado Digitalmente">Cliente ciente e aceitou as orientações</option>
+              <option value="Recusado">Não aceito</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-foot">
+          <button type="button" class="btn-action btn-secondary" onclick="closeModal('modalAnamnese')">Cancelar</button>
+          <button type="submit" class="btn-action">Registrar Ficha</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-      metricCount.textContent = totalAppointments;
-      badgeTotal.textContent = totalAppointments;
-      metricTotal.textContent = 'R$ ' + revenueTotal;
-
-      closeModal();
-      showToast('✅ Agendamento de ' + client + ' registrado!');
-    });
-
-    // BOTÃO DE NOTIFICAÇÃO
-    btnNotif.addEventListener('click', () => {
-      showToast('🔔 Nenhuma pendência crítica para esta unidade.');
-    });
-  </script>
-</body>
-</html>
+  <!-- MODAL: PROFISSIONAL & COMISSÃO -->
+  <div class="modal-wrap" id="modalStaff">
+    <div class="modal">
+      <div class="modal-head">
+        <h3>Novo Profissional & Comissão</h3>
+        <button class="close-btn" onclick="closeModal('modalStaff')">&times;</button>
+      </div>
+      <form id="formStaff" onsubmit="handleCreateStaff(event)">
+        <div class="modal-body">
+          <div class="field">
+            <label>Nome do Profissional</label>
+            <input type="text" id="sName" required placeholder="Ex: Camila Silva">
+          </div>
+          <div class="field">
+            <label>Especialidade</label>
+            <input type="text" id="sRole" required placeholder="Ex: Cabeleireira / Colorista">
+          </div>
+          <div class="field">
+            <label>Percentual de Comissão (%)</label>
+            <input type="number" id="sCommission" required min="0" max="100" value="40">
+          </div>
+          <div class="field">
+            <label>Conta Google Agenda Vinculada (Opcional)</label>
+            <input type="email" id="sGoogleAccount" placeholder="profissional@gmail.com">
